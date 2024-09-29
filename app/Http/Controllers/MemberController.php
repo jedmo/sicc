@@ -28,10 +28,10 @@ class MemberController extends Controller
         if (!$cell_id){
             $members = $this->getMembersData();
         } else {
-            $members = CellMember::where('cell_id', $cell_id)->with(['member' => function ($query) {
-                $query->orderBy('status', 'desc');
-            }])->paginate(10);
-            // dd($members);
+            $members = CellMember::where('cell_id', $cell_id)
+            ->join('members', 'cell_members.member_id', '=', 'members.id')
+            ->orderBy('members.status', 'desc')
+            ->paginate(10);
         }
 
         $user_id = Auth::id();

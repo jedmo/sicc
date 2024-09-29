@@ -32,7 +32,7 @@
                             </div>
                             @include('modules.church_attendances.form')
                             <div class="button-group d-flex pt-25 justify-content-md-end justify-content-start">
-                                <a href="{{ route('reports.index') }}" class="btn btn-light btn-default btn-squared fw-400 text-capitalize m-sm-0 m-1">Cancelar</a>
+                                <a href="{{ route('church-attendances.index') }}" class="btn btn-light btn-default btn-squared fw-400 text-capitalize m-sm-0 m-1">Cancelar</a>
                                 <button type="submit" class="btn btn-primary btn-default btn-squared radius-md shadow2 btn-sm">Actualizar</button>
                             </div>
                         </div>

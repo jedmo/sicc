@@ -343,7 +343,9 @@ trait DataFilterTrait
             case 'Supervisor':
                 $sector = Sector::where('user_id', $user_id)->first();
                 $cells = Cell::where('sector_id', $sector->id)->pluck('id');
-                $members = CellMember::whereIn('cell_id', $cells)->orderBy('id','desc')->paginate(10);
+                $members = CellMember::whereIn('cell_id', $cells)->with(['member' => function ($query) {
+                    $query->orderBy('status', 'asc');
+                }])->paginate(10);
                 break;
             case 'Pastor de Zona':
                 $zone = Zone::where('user_id', $user_id)->first();
