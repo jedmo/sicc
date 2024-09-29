@@ -1,0 +1,7 @@
+@import './pagination.scss';
+.form-element .custom-file-label::after {
+    content: "Subir" !important;
+}
+.ui-datepicker-calendar tbody td a.ui-state-hover {
+    border: 1px solid var(--color-primary);
+}
