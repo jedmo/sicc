@@ -1,8 +1,17 @@
 @extends('layout.app')
 @section('content')
     <div class="container-fluid">
+        <div class="alert-icon-big alert alert-info mt-30" role="alert">
+            <div class="alert-icon">
+                <img src="{{ asset('assets/img/svg/layers.svg') }}" alt="layers" class="svg">
+            </div>
+            <div class="alert-content">
+                <p>Solo se permite agregar o actualizar la asistencia al la reunión de supervisión durante la semana actual.</p>
+            </div>
+        </div>
         @hasanyrole('Líder|Supervisor|Administrador')
             <div class="row">
+                @if (count($attendances) > 0 && Carbon\Carbon::now()->diffInDays($attendances[0]->date) > 7)
                 <div class="col-lg-12">
                     <div class="contact-breadcrumb">
                         <div class="breadcrumb-main add-contact justify-content-sm-between ">
@@ -16,6 +25,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
         @endhasanyrole
         <div class="row">
@@ -94,17 +104,17 @@
                                                 <tr>
                                                     <td>
                                                         <div class="userDatatable-content d-inline-block">
-                                                            <span>{{ $attendance['zone'] }}</span>
+                                                            <span>{{ $attendance['zone']['code'] }}</span>
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="userDatatable-content d-inline-block">
-                                                            <span>{{ $attendance['sector'] }}</span>
+                                                            <span>{{ $attendance['sector']['code'] }}</span>
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="userDatatable-content d-inline-block">
-                                                            <span>{{ $attendance['date'] }}</span>
+                                                            <span>{{ Carbon\Carbon::parse($attendance['date'])->format('d/m/y') }}</span>
                                                         </div>
                                                     </td>
                                                     <td>
@@ -114,35 +124,37 @@
                                                     </td>
                                                     @hasanyrole('Líder|Supervisor|Administrador')
                                                     <td>
-                                                        <ul class="orderDatatable_actions mb-0 d-flex flex-wrap">
-                                                            <li>
-                                                                <a href="{{ route('supervision-attendances.edit', $attendance->id) }}"
-                                                                    class="edit">
-                                                                    <i class="uil uil-edit"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a
-                                                                    href="#"
-                                                                    class="remove"
-                                                                    onclick="
-                                                                        event.preventDefault();
-                                                                        if ( confirm('¿Desea eliminar el reporte?') ) {
-                                                                            document.getElementById( 'delete-{{ $attendance->id }}' ).submit();
-                                                                        }
-                                                                    "
-                                                                >
-                                                                    <i class="uil uil-trash-alt"></i>
-                                                                </a>
+                                                        @if ( Carbon\Carbon::parse($attendance['date']) >= Carbon\Carbon::now()->startOfWeek() && Carbon\Carbon::parse($attendance['date']) <= Carbon\Carbon::now()->endOfWeek() )
+                                                            <ul class="orderDatatable_actions mb-0 d-flex flex-wrap">
+                                                                <li>
+                                                                    <a href="{{ route('supervision-attendances.edit', $attendance->id) }}"
+                                                                        class="edit">
+                                                                        <i class="uil uil-edit"></i>
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a
+                                                                        href="#"
+                                                                        class="remove"
+                                                                        onclick="
+                                                                            event.preventDefault();
+                                                                            if ( confirm('¿Desea eliminar el reporte?') ) {
+                                                                                document.getElementById( 'delete-{{ $attendance->id }}' ).submit();
+                                                                            }
+                                                                        "
+                                                                    >
+                                                                        <i class="uil uil-trash-alt"></i>
+                                                                    </a>
 
-                                                                <form style="display:none;" id="delete-{{ $attendance->id }}"
-                                                                    action="{{ route('supervision-attendances.destroy', $attendance->id) }}"
-                                                                    method="POST">
-                                                                    @csrf
-                                                                    @method('delete')
-                                                                </form>
-                                                            </li>
-                                                        </ul>
+                                                                    <form style="display:none;" id="delete-{{ $attendance->id }}"
+                                                                        action="{{ route('supervision-attendances.destroy', $attendance->id) }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        @method('delete')
+                                                                    </form>
+                                                                </li>
+                                                            </ul>
+                                                        @endif
                                                     </td>
                                                     @endhasanyrole
                                                 </tr>

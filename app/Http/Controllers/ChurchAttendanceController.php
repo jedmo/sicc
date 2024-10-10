@@ -116,7 +116,7 @@ class ChurchAttendanceController extends Controller
             }
         } elseif ($role == 'Líder') {
             $cell = Cell::where('user_leader_id', $user_id)->first();
-            $church_attendances = ChurchAttendance::where('cell_id', $cell->id)->orderBy('start_date','desc')->limit(1)->get();
+            $church_attendances = ChurchAttendance::where('cell_id', $cell->id)->orderBy('start_date','desc')->get();
         }
 
         return view('modules.church_attendances.index', compact('church_attendances', 'week'));
@@ -186,17 +186,16 @@ class ChurchAttendanceController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\ChurchAttendance  $churchAttendance
+     * @param  \App\Models\ChurchAttendance  $church_attendance
      * @return \Illuminate\View\View
      */
-    public function edit(ChurchAttendance $churchAttendance)
+    public function edit(ChurchAttendance $church_attendance)
     {
         $user_id = Auth::id();
-        $cells = Cell::find($churchAttendance->cell_id);
-        $members = CellMember::where('cell_id', $churchAttendance->cell_id)->whereHas('member', function ($query) {$query->where('status', 1);})->get();
-        $church_attendance = $churchAttendance;
+        $cells = Cell::find($church_attendance->cell_id);
+        $members = CellMember::where('cell_id', $church_attendance->cell_id)->whereHas('member', function ($query) {$query->where('status', 1);})->get();
 
-        return view('modules.church_attendances.edit',compact('church_attendance', 'user_id', 'cells', 'churchAttendance', 'members'));
+        return view('modules.church_attendances.edit',compact('church_attendance', 'user_id', 'cells', 'members'));
     }
 
     /**

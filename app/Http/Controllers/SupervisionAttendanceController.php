@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSupervisionAttendanceRequest;
 use App\Http\Requests\UpdateSupervisionAttendanceRequest;
 use App\Models\Cell;
+use App\Models\CellMember;
 use App\Models\District;
 use App\Models\Sector;
 use App\Models\SupervisionAttendance;
 use App\Models\Zone;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use App\Models\CellMember;
+use Illuminate\Support\Facades\DB;
 
 class SupervisionAttendanceController extends Controller
 {
@@ -34,16 +35,38 @@ class SupervisionAttendanceController extends Controller
             switch ($role) {
                 case 'Supervisor':
                     $sector = Sector::where('user_id', $user_id)->first();
-                    $attendances = SupervisionAttendance::where('start_date', $start_date)->where('end_date', $end_date)->whereIn('sector_id', $sector->id)->orderBy('start_date','desc')->get();
+                    $attendances = SupervisionAttendance::where('sector_id', $sector->id)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
                     break;
                 case 'Pastor de Zona':
                     $zone = Zone::where('user_id', $user_id)->first();
-                    $attendances = SupervisionAttendance::where('start_date', $start_date)->where('end_date', $end_date)->whereIn('zone_id', $zone->id)->orderBy('start_date','desc')->get();
+                    $attendances = SupervisionAttendance::where('zone_id', $zone->id)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
                     break;
                 case 'Pastor de Distrito':
                     $district = District::where('user_id', $user_id)->first();
                     $zone = Zone::where('district_id', $district->id)->pluck('id');
-                    $attendances = SupervisionAttendance::where('start_date', $start_date)->where('end_date', $end_date)->whereIn('zone_id', $zone)->orderBy('start_date','desc')->get();
+                    $attendances = SupervisionAttendance::whereIn('zone_id', $zone)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
+                    break;
+                case 'Pastor General':
+                case 'Anciano':
+                    $attendances = [];
+                    break;
+                default:
+                    $attendances = [];
+            }
+        } else {
+            switch ($role) {
+                case 'Supervisor':
+                    $sector = Sector::where('user_id', $user_id)->first();
+                    $attendances = SupervisionAttendance::where('sector_id', $sector->id)->orderBy('date','desc')->get();
+                    break;
+                case 'Pastor de Zona':
+                    $zone = Zone::where('user_id', $user_id)->first();
+                    $attendances = SupervisionAttendance::where('zone_id', $zone->id)->orderBy('date','desc')->get();
+                    break;
+                case 'Pastor de Distrito':
+                    $district = District::where('user_id', $user_id)->first();
+                    $zone = Zone::where('district_id', $district->id)->pluck('id');
+                    $attendances = SupervisionAttendance::whereIn('zone_id', $zone)->orderBy('date','desc')->get();
                     break;
                 case 'Pastor General':
                 case 'Anciano':
@@ -94,33 +117,64 @@ class SupervisionAttendanceController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\StoreSupervisionAttendanceRequest  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(StoreSupervisionAttendanceRequest $request)
     {
-        //
+        $validated_data = $request->validated();
+
+        $validated_data['member_attendance'] = json_encode(request()->input('member_attendance'));
+        $date = request()->input('date');
+        $formattedDate = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
+        $validated_data['date'] = $formattedDate;
+        // dd($validated_data);
+        SupervisionAttendance::create($validated_data);
+
+        return redirect()->route('supervision-attendances.index')->with('success','El registro ha sido creado exitosamente.');
     }
 
     /**
      * Display the specified resource.
      *
      * @param  \App\Models\SupervisionAttendance  $supervisionAttendance
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function show(SupervisionAttendance $supervisionAttendance)
     {
-        //
+        return view('modules.supervision_attendances.show',compact('supervisionAttendance'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\SupervisionAttendance  $supervisionAttendance
-     * @return \Illuminate\Http\Response
+     * @param  \App\Models\SupervisionAttendance  $supervision_attendance
+     * @return \Illuminate\View\View
      */
-    public function edit(SupervisionAttendance $supervisionAttendance)
+    public function edit(SupervisionAttendance $supervision_attendance)
     {
-        //
+        $user_id = Auth::id();
+        $role = auth()->user()->roles->pluck('name')[0];
+        $members = [];
+        switch ($role) {
+            case 'Supervisor':
+                $sector = Sector::where('user_id', $user_id)->first();
+                $zone_id = $sector->zone_id;
+                $cells = Cell::where('sector_id', $sector->id)->pluck('id');
+                $members = CellMember::whereIn('cell_id', $cells)->whereHas('member', function ($query) {$query->where('status', 1);})->get();
+              break;
+            case 'Pastor de Zona':
+                $zone = Zone::where('user_id', $user_id)->first();
+                $zone_id = $zone->id;
+                $sector = Sector::where('zone_id', $zone->id)->pluck('id');
+                $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
+                $members = CellMember::whereIn('cell_id', $cells)->whereHas('member', function ($query) {$query->where('status', 1);})->get();
+              break;
+            default:
+                $members = [];
+        }
+        $supervision_attendance['member_attendance'] = isset($supervision_attendance->member_attendance) ? json_decode($supervision_attendance->member_attendance) : [];
+
+        return view('modules.supervision_attendances.edit', compact('zone_id','sector','members','supervision_attendance'));
     }
 
     /**
@@ -128,21 +182,32 @@ class SupervisionAttendanceController extends Controller
      *
      * @param  \App\Http\Requests\UpdateSupervisionAttendanceRequest  $request
      * @param  \App\Models\SupervisionAttendance  $supervisionAttendance
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(UpdateSupervisionAttendanceRequest $request, SupervisionAttendance $supervisionAttendance)
     {
-        //
+        $validated_data = $request->validated();
+
+        $validated_data['member_attendance'] = json_encode(request()->input('member_attendance'));
+        $date = request()->input('date');
+        $formattedDate = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
+        $validated_data['date'] = $formattedDate;
+
+        $supervisionAttendance->fill($validated_data)->save();
+
+        return redirect()->route('supervision-attendances.index')->with('success','El registro ha sido actualizado con éxito.');
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\SupervisionAttendance  $supervisionAttendance
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(SupervisionAttendance $supervisionAttendance)
     {
-        //
+        $supervisionAttendance->delete();
+
+        return redirect()->route('supervision-attendances.index')->with('success','El registro ha sido eliminado exitosamente');
     }
 }
