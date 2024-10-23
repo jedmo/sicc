@@ -90,6 +90,30 @@
     </div>
 </div>
 <div class="form-group row mb-25">
+    <h6>OFRENDAS</h6>
+    <div class="col-md-4 mb-25">
+        <div class="with-icon">
+            <label for="church_offering" class="color-dark fs-14 fw-500 align-center">Iglesia</label>
+            <input type="text" class="form-control ih-medium ip-light radius-xs b-light" id="church_offering" name="church_offering"
+            value="{{ $report->church_offering }}" placeholder="$" />
+        </div>
+    </div>
+    <div class="col-md-4 mb-25">
+        <div class="with-icon">
+            <label for="offering_meter_by_meter" class="color-dark fs-14 fw-500 align-center">Metro a Metro</label>
+            <input type="text" class="form-control ih-medium ip-light radius-xs b-light" id="offering_meter_by_meter" name="offering_meter_by_meter"
+            value="{{ $report->offering_meter_by_meter }}" placeholder="$" />
+        </div>
+    </div>
+    <div class="col-md-4 mb-25">
+        <div class="with-icon">
+            <label for="pro_bus_offering" class="color-dark fs-14 fw-500 align-center">Pro-Bus</label>
+            <input type="text" class="form-control ih-medium ip-light radius-xs b-light" id="pro_bus_offering" name="pro_bus_offering"
+            value="{{ $report->pro_bus_offering }}" placeholder="$" />
+        </div>
+    </div>
+</div>
+<div class="form-group row mb-25">
     <h6>RESULTADOS</h6>
     <div class="col-md-3 mb-25">
         <div class="with-icon">
@@ -117,30 +141,6 @@
             <label for="water_baptisms" class="color-dark fs-14 fw-500 align-center">Bautizmos</label>
             <input type="number" class="form-control ih-medium ip-light radius-xs b-light" id="water_baptisms" name="water_baptisms"
             value="{{ $report->water_baptisms }}" />
-        </div>
-    </div>
-</div>
-<div class="form-group row mb-25">
-    <h6>OFRENDAS</h6>
-    <div class="col-md-4 mb-25">
-        <div class="with-icon">
-            <label for="church_offering" class="color-dark fs-14 fw-500 align-center">Iglesia</label>
-            <input type="text" class="form-control ih-medium ip-light radius-xs b-light" id="church_offering" name="church_offering"
-            value="{{ $report->church_offering }}" placeholder="$" />
-        </div>
-    </div>
-    <div class="col-md-4 mb-25">
-        <div class="with-icon">
-            <label for="offering_meter_by_meter" class="color-dark fs-14 fw-500 align-center">Metro a Metro</label>
-            <input type="text" class="form-control ih-medium ip-light radius-xs b-light" id="offering_meter_by_meter" name="offering_meter_by_meter"
-            value="{{ $report->offering_meter_by_meter }}" placeholder="$" />
-        </div>
-    </div>
-    <div class="col-md-4 mb-25">
-        <div class="with-icon">
-            <label for="pro_bus_offering" class="color-dark fs-14 fw-500 align-center">Pro-Bus</label>
-            <input type="text" class="form-control ih-medium ip-light radius-xs b-light" id="pro_bus_offering" name="pro_bus_offering"
-            value="{{ $report->pro_bus_offering }}" placeholder="$" />
         </div>
     </div>
 </div>

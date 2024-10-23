@@ -2276,7 +2276,9 @@ $(document).ready(function () {
     $('#total_attendance_week').val(siblingAttD1 + friendsAttD1 + siblingAttD2 + friendsAttD2 + siblingAttSd + friendsAttSd);
   }
   $('#select-cell').on('change', function () {
-    axios.get("/api/cell_members/" + $(this).val()).then(function (response) {
+    axios.get("/cell_members/list" + $(this).val(), {
+      withCredentials: true
+    }).then(function (response) {
       var rd = response.data;
       $('#cell-member-attendance-table tbody').empty();
       $.each(rd.data, function (key, value) {
@@ -2402,67 +2404,72 @@ var graphContainer = document.querySelector("#cell_meeting_graph");
 if (graphContainer) {
   graphContainer = graphContainer.parentNode;
   if (isElementInViewport(graphContainer)) {
-    var assistance;
-    axios.get("/api/assistance").then(function (response) {
-      assistance = response.data;
+    var assistance = [];
+    axios.get("/report/assistance", {
+      withCredentials: true
+    }).then(function (response) {
+      console.log(response);
+      assistance = response.data.assistance;
+      dates = response.data.dates;
+      attendance = response.data.attendance;
+      var cmg_options = {
+        series: [{
+          name: "Asistencia",
+          data: attendance
+        }],
+        chart: {
+          height: 350,
+          type: "bar"
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 10
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        colors: ['#8231D3'],
+        xaxis: {
+          categories: dates,
+          axisBorder: {
+            show: false
+          },
+          axisTicks: {
+            show: false
+          }
+        }
+      };
+      var apg_options = {
+        series: assistance,
+        chart: {
+          width: 380,
+          type: "pie"
+        },
+        labels: ["Adultos", "Jóvenes", "Niños"],
+        legend: {
+          show: false
+        },
+        colors: ["#8231d3", "#00aaff", "#5940ff"],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: "bottom"
+            }
+          }
+        }]
+      };
+      var cmg_chart = new ApexCharts(document.querySelector("#cell_meeting_graph"), cmg_options);
+      cmg_chart.render();
+      var apg_chart = new ApexCharts(document.querySelector("#attendance_percentage_graph"), apg_options);
+      apg_chart.render();
     })["catch"](function (error) {
       assistance = [0, 0, 0];
     });
-    var cmg_options = {
-      series: [{
-        name: "Asistencia",
-        data: [3, 3, 4, 5, 4, 3, 3, 6, 4, 8, 5, 6]
-      }],
-      chart: {
-        height: 350,
-        type: "bar"
-      },
-      plotOptions: {
-        bar: {
-          borderRadius: 10
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      colors: ['#8231D3'],
-      xaxis: {
-        categories: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
-        axisBorder: {
-          show: false
-        },
-        axisTicks: {
-          show: false
-        }
-      }
-    };
-    var apg_options = {
-      series: [5, 0, 1],
-      chart: {
-        width: 380,
-        type: "pie"
-      },
-      labels: ["Adultos", "Jóvenes", "Niños"],
-      legend: {
-        show: false
-      },
-      colors: ["#8231d3", "#00aaff", "#5940ff"],
-      responsive: [{
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200
-          },
-          legend: {
-            position: "bottom"
-          }
-        }
-      }]
-    };
-    var cmg_chart = new ApexCharts(document.querySelector("#cell_meeting_graph"), cmg_options);
-    cmg_chart.render();
-    var apg_chart = new ApexCharts(document.querySelector("#attendance_percentage_graph"), apg_options);
-    apg_chart.render();
   }
 }
 

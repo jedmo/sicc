@@ -98,7 +98,7 @@ $(document).ready(function(){
     }
 
     $('#select-cell').on('change', function() {
-        axios.get("/api/cell_members/" + $(this).val())
+        axios.get("/cell_members/list" + $(this).val(), { withCredentials: true })
         .then((response) => {
             var rd = response.data;
 

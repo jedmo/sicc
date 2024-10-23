@@ -21,7 +21,19 @@ use Illuminate\Support\Facades\Auth;
 class ReportController extends Controller
 {
     use DataFilterTrait;
+    protected $user_id;
+    protected $role;
 
+    public function __construct()
+    {
+        $this->user_id = Auth::id();
+        $user = Auth::user();
+        if ($user) {
+            $this->role = $user->roles->pluck('name')[0];
+        } else {
+            $this->role = '';
+        }
+    }
     /**
      * Display a listing of the resource.
      *
@@ -43,16 +55,15 @@ class ReportController extends Controller
      */
     public function create()
     {
-        $user = User::find(auth()->user()->id);
-        $role = auth()->user()->roles->pluck('name')[0];
+        $user = User::find($this->user_id);
         $districts = [];
         $zones = [];
         $sectors = [];
         $cells = [];
         $members = [];
-        switch ($role) {
+        switch ($this->role) {
             case 'Líder':
-                $cells = Cell::where('user_leader_id', auth()->user()->id)->first();
+                $cells = Cell::where('user_leader_id', $this->user_id)->first();
                 $members = CellMember::where('cell_id', $cells->id)->whereHas('member', function ($query) {$query->where('status', 1);})->get();
               break;
             case 'Supervisor':
@@ -84,8 +95,6 @@ class ReportController extends Controller
      */
     public function store(StoreReportRequest $request)
     {
-        $user_id = Auth::id();
-
         $request->validated();
         $attendance = request()->input('attendance');
         $cell_id = request()->input('cell_id');
@@ -96,7 +105,7 @@ class ReportController extends Controller
         $formattedDate = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
 
         $validated_data['date'] = $formattedDate;
-        $validated_data['user_id'] = $user_id;
+        $validated_data['user_id'] = $this->user_id;
 
         $report = Report::create($validated_data);
         $cell_attendance = new CellAttendance();
@@ -128,11 +137,12 @@ class ReportController extends Controller
      */
     public function edit(Report $report)
     {
-        $user = User::find(auth()->user()->id);
+        $user = User::find($this->user_id);
         $cells = Cell::find($report->cell_id);
         $members = CellMember::where('cell_id', $report->cell_id)->whereHas('member', function ($query) {$query->where('status', 1);})->get();
         $cell_attendance = CellAttendance::where('report_id', $report->id)->first();
-        $cell_attendance['member_attendance'] = isset($cell_attendance->member_attendance) ? json_decode($cell_attendance->member_attendance) : [];
+        $member_attendance = json_decode($cell_attendance->member_attendance);
+        $cell_attendance['member_attendance'] = $member_attendance ?? [];
         return view('modules.reports.edit',compact('user', 'cells', 'report', 'members', 'cell_attendance'));
     }
 
@@ -145,8 +155,6 @@ class ReportController extends Controller
      */
     public function update(UpdateReportRequest $request, Report $report)
     {
-        $user_id = Auth::id();
-
         $request->validated();
         $attendance = request()->input('attendance');
         $cell_id = request()->input('cell_id');
@@ -157,7 +165,7 @@ class ReportController extends Controller
         $formattedDate = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
 
         $validated_data['date'] = $formattedDate;
-        $validated_data['user_id'] = $user_id;
+        $validated_data['user_id'] = $this->user_id;
 
         $cell_attendance = CellAttendance::where('report_id',$report->id)->first();
         if (!isset($cell_attendance)) {
@@ -196,32 +204,33 @@ class ReportController extends Controller
     {
         $sector_id = request('sector_id');
         $date = request('date');
-        $start_date = '';
-        $end_date = '';
+        $start_date = request('start_date');
+        $end_date = request('end_date');
         $reports = [];
 
-        $user_id = Auth::id();
-        $role = Auth::user()->roles->pluck('name')[0];
-
-        if (!empty($date)) {
-            $_date = explode(' - ', $date);
-            $start_date = Carbon::createFromFormat('d/m/Y', $_date[0])->format('Y-m-d');
-            $end_date = Carbon::createFromFormat('d/m/Y', $_date[1])->format('Y-m-d');
+        if (!empty($date) || (!empty($start_date) && !empty($end_date))) {
+            if (!empty($date)) {
+                $_date = explode(' - ', $date);
+                $start_date = Carbon::createFromFormat('d/m/Y', $_date[0])->format('Y-m-d');
+                $end_date = Carbon::createFromFormat('d/m/Y', $_date[1])->format('Y-m-d');
+            } else {
+                $start_date = Carbon::createFromFormat('d/m/Y', $start_date)->format('Y-m-d');
+                $end_date = Carbon::createFromFormat('d/m/Y', $end_date)->format('Y-m-d');
+            }
 
             if($sector_id){
-                // $sectors = Sector::where('user_id', $user_id)->first();
                 $cells = Cell::where('sector_id', $sector_id)->pluck('id');
                 $reports = Report::whereBetween('date', [$start_date, $end_date])->whereIn('cell_id', $cells)->orderBy('id','desc')->get();
             } else {
-                switch ($role) {
+                switch ($this->role) {
                     case 'Pastor de Zona':
-                        $zone = Zone::where('user_id', $user_id)->first();
+                        $zone = Zone::where('user_id', $this->user_id)->first();
                         $sector = Sector::where('zone_id', $zone->id)->pluck('id');
                         $cells = Cell::where('sector_id', $sector_id)->pluck('id');
                         $reports = Report::whereBetween('date', [$start_date, $end_date])->whereIn('cell_id', $cells)->orderBy('id','desc')->get();
                         break;
                     case 'Pastor de Distrito':
-                        $district = District::where('user_id', $user_id)->first();
+                        $district = District::where('user_id', $this->user_id)->first();
                         $zone = Zone::where('district_id', $district->id)->pluck('id');
                         $sector = Sector::whereIn('zone_id', $zone)->pluck('id');
                         $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
@@ -263,7 +272,7 @@ class ReportController extends Controller
         }
 
         $sectors = $this->getSectors();
-        return view('modules.reports.sectors', compact('reports','sum_reports', 'sectors', 'sector_id', 'date'));
+        return view('modules.reports.sectors', compact('reports','sum_reports', 'sectors', 'sector_id', 'date', 'start_date', 'end_date'));
     }
     /**
      * Display a listing of the resource.
@@ -274,32 +283,35 @@ class ReportController extends Controller
     {
         $zone_id = request('zone_id');
         $date = request('date');
-        $start_date = '';
-        $end_date = '';
+        $start_date = request('start_date');
+        $end_date = request('end_date');
 
-        $user_id = Auth::id();
-        $role = Auth::user()->roles->pluck('name')[0];
         $zones = $this->getZones();
 
-        if (!empty($date)) {
-            $_date = explode(' - ', $date);
-            $start_date = Carbon::createFromFormat('d/m/Y', $_date[0])->format('Y-m-d');
-            $end_date = Carbon::createFromFormat('d/m/Y', $_date[1])->format('Y-m-d');
+        if (!empty($date) || (!empty($start_date) && !empty($end_date))) {
+            if (!empty($date)) {
+                $_date = explode(' - ', $date);
+                $start_date = Carbon::createFromFormat('d/m/Y', $_date[0])->format('Y-m-d');
+                $end_date = Carbon::createFromFormat('d/m/Y', $_date[1])->format('Y-m-d');
+            } else {
+                $start_date = Carbon::createFromFormat('d/m/Y', $start_date)->format('Y-m-d');
+                $end_date = Carbon::createFromFormat('d/m/Y', $end_date)->format('Y-m-d');
+            }
 
             if($zone_id) {
                 $sectors = Sector::where('zone_id', $zone_id)->pluck('id');
                 $cells = Cell::whereIn('sector_id', $sectors)->pluck('id');
                 $reports = Report::whereBetween('date', [$start_date, $end_date])->whereIn('cell_id', $cells)->orderBy('id','desc')->get();
             } else {
-                switch ($role) {
+                switch ($this->role) {
                     case 'Pastor de Zona':
-                        $zone = Zone::where('user_id', $user_id)->first();
+                        $zone = Zone::where('user_id', $this->user_id)->first();
                         $sectors = Sector::where('zone_id', $zone->id)->pluck('id');
                         $cells = Cell::whereIn('sector_id', $sectors)->pluck('id');
                         $reports = Report::whereBetween('date', [$start_date, $end_date])->whereIn('cell_id', $cells)->orderBy('id','desc')->get();
                         break;
                     case 'Pastor de Distrito':
-                        $district = District::where('user_id', $user_id)->first();
+                        $district = District::where('user_id', $this->user_id)->first();
                         $zones = Zone::where('district_id', $district->id)->pluck('id');
                         $sectors = Sector::whereIn('zone_id', $zones)->pluck('id');
                         $cells = Cell::whereIn('sector_id', $sectors)->pluck('id');
@@ -424,10 +436,10 @@ class ReportController extends Controller
                 'total_reconciliations' => $grouped_reports->sum('reconciliations')
             ];
 
-            return view('modules.reports.zones', compact('grouped_reports', 'zones', 'zone_id', 'date', 'sum_reports'));
+            return view('modules.reports.zones', compact('grouped_reports', 'zones', 'zone_id', 'date', 'sum_reports', 'start_date', 'end_date'));
         } else {
             $grouped_reports = [];
-            return view('modules.reports.zones', compact('grouped_reports', 'zones', 'zone_id', 'date'));
+            return view('modules.reports.zones', compact('grouped_reports', 'zones', 'zone_id', 'date', 'start_date', 'end_date'));
         }
     }
 
@@ -438,8 +450,6 @@ class ReportController extends Controller
         $start_date = '';
         $end_date = '';
 
-        $user_id = Auth::id();
-        $role = Auth::user()->roles->pluck('name')[0];
         $districts = $this->getDistrict();
 
         if (!empty($date)) {
@@ -453,9 +463,9 @@ class ReportController extends Controller
                 $cells = Cell::whereIn('sector_id', $sectors)->pluck('id');
                 $reports = Report::whereBetween('date', [$start_date, $end_date])->whereIn('cell_id', $cells)->orderBy('id','desc')->get();
             } else {
-                switch ($role) {
+                switch ($this->role) {
                     case 'Pastor de Distrito':
-                        $district = District::where('user_id', $user_id)->first();
+                        $district = District::where('user_id', $this->user_id)->first();
                         $zones = Zone::where('district_id', $district->id)->pluck('id');
                         $sectors = Sector::whereIn('zone_id', $zones)->pluck('id');
                         $cells = Cell::whereIn('sector_id', $sectors)->pluck('id');
@@ -594,9 +604,6 @@ class ReportController extends Controller
         $start_date = '';
         $end_date = '';
 
-        $user_id = Auth::id();
-        $role = Auth::user()->roles->pluck('name')[0];
-
         if (!empty($date)) {
             $_date = explode(' - ', $date);
             $start_date = Carbon::createFromFormat('d/m/Y', $_date[0])->format('Y-m-d');
@@ -697,9 +704,6 @@ class ReportController extends Controller
         $start_date = '';
         $end_date = '';
 
-        $user_id = Auth::id();
-        $role = Auth::user()->roles->pluck('name')[0];
-
         if (!empty($date)) {
             $_date = explode(' - ', $date);
             $start_date = Carbon::createFromFormat('d/m/Y', $_date[0])->format('Y-m-d');
@@ -797,27 +801,24 @@ class ReportController extends Controller
 
     public function graphShow()
     {
-        $user_id = Auth::id();
-        $role = Auth::user()->roles->pluck('name')[0];
-
-        switch ($role) {
+        switch ($this->role) {
             case 'Líder':
-                $cell = Cell::where('user_leader_id', $user_id)->first();
+                $cell = Cell::where('user_leader_id', $this->user_id)->first();
                 $report = Report::where('cell_id', $cell->id)->orderBy('date','desc')->first();
                 break;
             case 'Supervisor':
-                $sector = Sector::where('user_id', $user_id)->first();
+                $sector = Sector::where('user_id', $this->user_id)->first();
                 $cells = Cell::where('sector_id', $sector->id)->pluck('id');
                 $report = Report::whereIn('cell_id', $cells)->orderBy('date','desc')->first();
                 break;
             case 'Pastor de Zona':
-                $zone = Zone::where('user_id', $user_id)->first();
+                $zone = Zone::where('user_id', $this->user_id)->first();
                 $sector = Sector::where('zone_id', $zone->id)->pluck('id');
                 $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
                 $report = Report::whereIn('cell_id', $cells)->orderBy('id','desc')->first();
                 break;
             case 'Pastor de Distrito':
-                $district = District::where('user_id', $user_id)->first();
+                $district = District::where('user_id', $this->user_id)->first();
                 $zone = Zone::where('district_id', $district->id)->pluck('id');
                 $sector = Sector::whereIn('zone_id', $zone)->pluck('id');
                 $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
@@ -836,7 +837,72 @@ class ReportController extends Controller
 
     public function assistance()
     {
-        return [5,0,1];
+        $startWeek = Carbon::now()->subWeek()->startOfWeek();
+        $endWeek   = Carbon::now()->subWeek()->endOfWeek();
+        $response = [];
+        $dates = [];
+        $attendance = [];
+        $user_id = Auth::id();
+        $role = Auth::user()->roles->pluck('name')[0];
+
+        switch ($role) {
+            case 'Líder':
+                $cell = Cell::where('user_leader_id', $user_id)->first();
+                break;
+            case 'Supervisor':
+                $sector = Sector::where('user_id', $user_id)->first();
+                $cells = Cell::where('sector_id', $sector->id)->pluck('id');
+                break;
+            case 'Pastor de Zona':
+                $zone = Zone::where('user_id', $user_id)->first();
+                $sector = Sector::whereIn('zone_id', $zone)->pluck('id');
+                $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
+                break;
+            case 'Pastor de Distrito':
+                $district = District::where('user_id', $user_id)->first();
+                $zone = Zone::where('district_id', $district->id)->pluck('id');
+                $sector = Sector::whereIn('zone_id', $zone)->pluck('id');
+                $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
+                break;
+            case 'Pastor General':
+            case 'Anciano':
+                $cells = Cell::pluck('id');
+                break;
+            default:
+                $cells = Cell::pluck('id');
+        }
+
+        if (!empty($cell)) {
+            $data = Report::where('cell_id', $cell->id)
+                    ->whereBetween('date',[ $startWeek,$endWeek ])->first();
+            $total_adult_attendance = $data['total_adult_attendance'] ?? 0;
+            $total_youth_attendance = $data['total_youth_attendance'] ?? 0;
+            $total_children_attendance = $data['total_children_attendance'] ?? 0;
+
+            $graph = Report::where('cell_id', $cell->id)->orderBy('date', 'desc')->take(12)->get();
+            foreach($graph as $r) {
+                array_push($dates, $r->date);
+                array_push($attendance, $r->total_attendance);
+            }
+        } else {
+            $data = Report::whereIn('cell_id', $cells)
+                    ->whereBetween('date',[ $startWeek,$endWeek ])->get();
+            $total_adult_attendance = $data->sum('total_adult_attendance') ?? 0;
+            $total_youth_attendance = $data->sum('total_youth_attendance') ?? 0;
+            $total_children_attendance = $data->sum('total_children_attendance') ?? 0;
+
+            $graph = Report::whereIn('cell_id', $cells)->orderBy('date', 'desc')->take(12)->get();
+            foreach($graph as $r) {
+                array_push($dates, $r->date);
+                array_push($attendance, $r->total_attendance);
+            }
+        }
+
+        $response['dates'] = array_reverse($dates);
+        $response['attendance'] = array_reverse($attendance);
+        $response['assistance'] = [$total_adult_attendance,$total_youth_attendance,$total_children_attendance];
+
+        return $response;
     }
 
 }

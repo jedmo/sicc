@@ -18,10 +18,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
-Route::get('reports', [ReportController::class,'graphShow'])->name('api.report.show');
-Route::get('cell_members/{cell_id}', [CellMemberController::class,'list'])->name('api.cell.members');
-Route::get('assistance', [ReportController::class,'assistance'])->name('api.cell.assistance');
+Route::group(['middleware'=>'auth'],function(){
+    Route::get('reports', [ReportController::class,'graphShow'])->name('api.report.show');
+    Route::get('cell_members/{cell_id}', [CellMemberController::class,'list'])->name('api.cell.members');
+    Route::get('assistance', [ReportController::class,'assistance'])->name('api.cell.assistance');
+});

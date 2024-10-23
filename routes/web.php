@@ -68,6 +68,10 @@ Route::group(['middleware'=>'auth'],function(){
     Route::get('/report/general', ReportController::class .'@general')->name('reports.general');
     Route::get('/report/stat-general', ReportController::class .'@statGeneral')->name('reports.stat-general');
     // Route::get('/cell-members/filter/{sector_id}', CellMemberController::class .'@index')->name('cell-members.search');
+
+    Route::get('/report/graph-show', [ReportController::class,'graphShow'])->name('reports.graph-show');
+    Route::get('/cell_members/list/{cell_id}', [CellMemberController::class,'list'])->name('cell_members.list');
+    Route::get('/report/assistance', [ReportController::class,'assistance'])->name('reports.assistance');
 });
 /************************ Custom Routes Ends ******************************/
 

@@ -11,7 +11,7 @@
                         <form method="GET">
                             <div class="row">
                                 @hasanyrole('Pastor de Zona|Pastor de Distrito|Pastor General|Administrador')
-                                <div class="col-md-4">
+                                <div class="col-md-2">
                                     <select class="form-control ih-medium ip-gray radius-xs b-light px-15" name="sector_id" id="sector_id">
                                         <option value="">Seleccione</option>
                                         @foreach ( $sectors as $sector )
@@ -27,11 +27,19 @@
                                     <h5>{{ $sectors['full_code'] }}</h5>
                                 </div>
                                 @endhasrole
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <input type="text" name="date" id="date" class="form-control ih-medium ip-gray radius-xs b-light px-15 week-picker"
-                                    placeholder="Seleccione semana" autocomplete="off" spellcheck="false" value="{{ $date }}">
+                                    placeholder="Seleccionar semana" autocomplete="off" spellcheck="false" value="{{ $date }}">
                                 </div>
-                                <div class="col-md-4 dm-button-list d-flex flex-wrap">
+                                <div class="col-md-2">
+                                    <input type="text" name="start_date" id="start_date" class="form-control ih-medium ip-gray radius-xs b-light px-15 input-date"
+                                    placeholder="Fecha inicio" autocomplete="off" spellcheck="false" value="{{ $start_date }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" name="end_date" id="end_date" class="form-control ih-medium ip-gray radius-xs b-light px-15 input-date"
+                                    placeholder="Fecha fin" autocomplete="off" spellcheck="false" value="{{ $end_date }}">
+                                </div>
+                                <div class="col-md-3 dm-button-list d-flex flex-wrap">
                                     <div class="action-btn mt-sm-0 mt-15">
                                         <button class="btn btn-secondary btn-default btn-rounded" type="submit">
                                             <i class="las la-search fs-16"></i>Filtrar

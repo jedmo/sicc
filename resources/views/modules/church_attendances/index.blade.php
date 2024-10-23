@@ -6,7 +6,7 @@
                 <img src="{{ asset('assets/img/svg/layers.svg') }}" alt="layers" class="svg">
             </div>
             <div class="alert-content">
-                <p>Solo se permite agregar o actualizar la asistencia al templo durante la semana actual.</p>
+                <p>Solo se permite agregar o actualizar la asistencia al templo de la semana actual.</p>
             </div>
         </div>
         @hasanyrole('Líder|Supervisor|Administrador')
