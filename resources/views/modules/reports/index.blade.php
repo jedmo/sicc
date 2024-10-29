@@ -89,6 +89,9 @@
                                             <th colspan="2" rowspan="2" class="text-center">
                                                 <span class="userDatatable-title">Resultados</span>
                                             </th>
+                                            <th colspan="3" rowspan="2" class="text-center">
+                                                <span class="userDatatable-title">Asistencia al templo</span>
+                                            </th>
                                             @hasanyrole('Líder|Supervisor|Administrador')
                                                 <th rowspan="3">
                                                     <span class="userDatatable-title float-end">Acciones</span>
@@ -152,6 +155,15 @@
                                             <th>
                                                 <span class="userDatatable-title">Rec.</span>
                                             </th>
+                                            <th>
+                                                <span class="userDatatable-title">D1</span>
+                                            </th>
+                                            <th>
+                                                <span class="userDatatable-title">D2</span>
+                                            </th>
+                                            <th>
+                                                <span class="userDatatable-title">Dom</span>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -163,21 +175,22 @@
                                             </tr>
                                         @else
                                             @foreach ($reports as $report)
+
                                                 <tr>
                                                     @hasanyrole('Supervisor|Pastor de Zona')
                                                     <td>
-                                                        <div class="userDatatable-content d-inline-block">
+                                                        <div class="userDatatable-content d-inline-block text-nowrap">
                                                             <span>{{ $report->cell->full_code }}</span>
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div class="userDatatable-content d-inline-block">
+                                                        <div class="userDatatable-content d-inline-block text-nowrap">
                                                             <span>{{ $report->cell->leader->full_name }}</span>
                                                         </div>
                                                     </td>
                                                     @endhasanyrole
                                                     <td>
-                                                        <div class="userDatatable-content d-inline-block">
+                                                        <div class="userDatatable-content d-inline-block text-nowrap">
                                                             <span>{{ $report->date }}</span>
                                                         </div>
                                                     </td>
@@ -254,6 +267,21 @@
                                                     <td>
                                                         <div class="userDatatable-content d-inline-block">
                                                             <span>{{ $report->reconciliations }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="userDatatable-content d-inline-block">
+                                                            <span>{{ $report->total_attendance_1d }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="userDatatable-content d-inline-block">
+                                                            <span>{{ $report->total_attendance_2d }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="userDatatable-content d-inline-block">
+                                                            <span>{{ $report->total_attendance_sd }}</span>
                                                         </div>
                                                     </td>
                                                     @hasanyrole('Líder|Supervisor|Administrador')

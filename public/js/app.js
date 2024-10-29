@@ -2298,6 +2298,36 @@ $(document).ready(function () {
   });
   $('.week-picker').datepicker({
     format: 'dd/mm/yy',
+    firstDay: 0,
+    // 1 = Monday, 0 = Sunday
+    language: 'es',
+    // Cambia a tu idioma preferido
+    showOtherMonths: true,
+    selectOtherMonths: true,
+    changeMonth: true,
+    changeYear: true,
+    onUpdateDatepicker: function onUpdateDatepicker(inst) {
+      $(".ui-datepicker-calendar tr").on("mousemove", function () {
+        $(this).find("td a").addClass("ui-state-hover");
+        $(this).find(".ui-datepicker-week-col").addClass("ui-state-hover");
+      });
+      $(".ui-datepicker-calendar tr").on("mouseleave", function () {
+        $(this).find("td a").removeClass("ui-state-hover");
+        $(this).find(".ui-datepicker-week-col").removeClass("ui-state-hover");
+      });
+    },
+    onSelect: function onSelect(dateText, inst) {
+      var date = $(this).datepicker('getDate');
+      var firstDayOfWeek = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay());
+      var lastDayOfWeek = new Date(firstDayOfWeek.getFullYear(), firstDayOfWeek.getMonth(), firstDayOfWeek.getDate() + 6);
+      var weekStart = padZero(firstDayOfWeek.getDate()) + '/' + padZero(firstDayOfWeek.getMonth() + 1) + '/' + firstDayOfWeek.getFullYear();
+      var weekEnd = padZero(lastDayOfWeek.getDate()) + '/' + padZero(lastDayOfWeek.getMonth() + 1) + '/' + lastDayOfWeek.getFullYear();
+      var weekRange = weekStart + ' - ' + weekEnd;
+      $('.week-picker').val(weekRange);
+    }
+  });
+  $('.week-picker2').datepicker({
+    format: 'dd/mm/yy',
     firstDay: 1,
     // 1 = Monday, 0 = Sunday
     language: 'es',
@@ -2318,12 +2348,12 @@ $(document).ready(function () {
     },
     onSelect: function onSelect(dateText, inst) {
       var date = $(this).datepicker('getDate');
-      var firstDayOfWeek = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 1);
+      var firstDayOfWeek = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay());
       var lastDayOfWeek = new Date(firstDayOfWeek.getFullYear(), firstDayOfWeek.getMonth(), firstDayOfWeek.getDate() + 6);
-      var weekStart = padZero(firstDayOfWeek.getDate()) + '/' + padZero(firstDayOfWeek.getMonth() + 1) + '/' + firstDayOfWeek.getFullYear();
-      var weekEnd = padZero(lastDayOfWeek.getDate()) + '/' + padZero(lastDayOfWeek.getMonth() + 1) + '/' + lastDayOfWeek.getFullYear();
+      var weekStart = padZero(firstDayOfWeek.getDate() + 1) + '/' + padZero(firstDayOfWeek.getMonth() + 1) + '/' + firstDayOfWeek.getFullYear();
+      var weekEnd = padZero(lastDayOfWeek.getDate() + 1) + '/' + padZero(lastDayOfWeek.getMonth() + 1) + '/' + lastDayOfWeek.getFullYear();
       var weekRange = weekStart + ' - ' + weekEnd;
-      $('.week-picker').val(weekRange);
+      $('.week-picker2').val(weekRange);
     }
   });
   function padZero(num) {

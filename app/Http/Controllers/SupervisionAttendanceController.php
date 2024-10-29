@@ -7,8 +7,10 @@ use App\Http\Requests\UpdateSupervisionAttendanceRequest;
 use App\Models\Cell;
 use App\Models\CellMember;
 use App\Models\District;
+use App\Models\Member;
 use App\Models\Sector;
 use App\Models\SupervisionAttendance;
+use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -90,12 +92,17 @@ class SupervisionAttendanceController extends Controller
         $user_id = Auth::id();
         $role = auth()->user()->roles->pluck('name')[0];
         $members = [];
+        $supervisor = '';
+
         switch ($role) {
             case 'Supervisor':
                 $sector = Sector::where('user_id', $user_id)->first();
                 $zone_id = $sector->zone_id;
                 $cells = Cell::where('sector_id', $sector->id)->pluck('id');
                 $members = CellMember::whereIn('cell_id', $cells)->whereHas('member', function ($query) {$query->where('status', 1);})->get();
+                $user = User::find($user_id);
+                $supervisor_member = Member::find($user->member_id);
+                $supervisor = CellMember::where('member_id',$supervisor_member->id)->first();
               break;
             case 'Pastor de Zona':
                 $zone = Zone::where('user_id', $user_id)->first();
@@ -110,7 +117,7 @@ class SupervisionAttendanceController extends Controller
 
         $supervision_attendance = new SupervisionAttendance();
 
-        return view('modules.supervision_attendances.create', compact('zone_id','sector','members','supervision_attendance'));
+        return view('modules.supervision_attendances.create', compact('zone_id','sector','members','supervision_attendance','supervisor'));
     }
 
     /**
@@ -155,12 +162,17 @@ class SupervisionAttendanceController extends Controller
         $user_id = Auth::id();
         $role = auth()->user()->roles->pluck('name')[0];
         $members = [];
+        $supervisor = '';
+
         switch ($role) {
             case 'Supervisor':
                 $sector = Sector::where('user_id', $user_id)->first();
                 $zone_id = $sector->zone_id;
                 $cells = Cell::where('sector_id', $sector->id)->pluck('id');
                 $members = CellMember::whereIn('cell_id', $cells)->whereHas('member', function ($query) {$query->where('status', 1);})->get();
+                $user = User::find($user_id);
+                $supervisor_member = Member::find($user->member_id);
+                $supervisor = CellMember::where('member_id',$supervisor_member->id)->first();
               break;
             case 'Pastor de Zona':
                 $zone = Zone::where('user_id', $user_id)->first();
@@ -174,7 +186,7 @@ class SupervisionAttendanceController extends Controller
         }
         $supervision_attendance['member_attendance'] = isset($supervision_attendance->member_attendance) ? json_decode($supervision_attendance->member_attendance) : [];
 
-        return view('modules.supervision_attendances.edit', compact('zone_id','sector','members','supervision_attendance'));
+        return view('modules.supervision_attendances.edit', compact('zone_id','sector','members','supervision_attendance','supervisor'));
     }
 
     /**

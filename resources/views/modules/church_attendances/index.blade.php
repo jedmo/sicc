@@ -11,7 +11,7 @@
         </div>
         @hasanyrole('Líder|Supervisor|Administrador')
             <div class="row">
-                @if (count($church_attendances) > 0 && Carbon\Carbon::now()->diffInDays($church_attendances[0]->start_date) > 7)
+                @if (!$existing)
                 <div class="col-lg-12">
                     <div class="contact-breadcrumb">
                         <div class="breadcrumb-main add-contact justify-content-sm-between ">
@@ -37,7 +37,7 @@
                         <form method="GET">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <input type="text" id="date" class="form-control ih-medium ip-gray radius-xs b-light px-15 week-picker" name="week"
+                                    <input type="text" id="date" class="form-control ih-medium ip-gray radius-xs b-light px-15 week-picker2" name="week"
                                         placeholder="Seleccione semana" autocomplete="off" spellcheck="false">
                                 </div>
                                 <div class="col-md-4 dm-button-list d-flex flex-wrap">

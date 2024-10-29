@@ -8,8 +8,10 @@ use App\Models\District;
 use App\Models\Report;
 use App\Models\Sector;
 use App\Models\Zone;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
 trait DataFilterTrait
@@ -149,25 +151,57 @@ trait DataFilterTrait
             switch ($role) {
                 case 'Líder':
                     $cell = Cell::where('user_leader_id', $user_id)->first();
-                    $reports = Report::where('cell_id', $cell->id)->orderBy('date','desc')->paginate(10);
+                    $reports = Report::select('reports.*', 'church_attendances.total_attendance_1d', 'church_attendances.total_attendance_2d', 'church_attendances.total_attendance_sd')
+                        ->leftJoin('church_attendances', function($join) {
+                            $join->on('reports.cell_id', '=', 'church_attendances.cell_id')
+                                ->where('reports.date', '>=', DB::raw('church_attendances.start_date'))
+                                ->where('reports.date', '<=', DB::raw('church_attendances.end_date'));
+                        })
+                        ->where('reports.cell_id', $cell->id)
+                        ->orderBy('reports.date', 'desc')
+                        ->paginate(10);
                     break;
                 case 'Supervisor':
                     $sector = Sector::where('user_id', $user_id)->first();
                     $cells = Cell::where('sector_id', $sector->id)->pluck('id');
-                    $reports = Report::whereIn('cell_id', $cells)->orderBy('date','desc')->paginate(10);
+                    $reports = Report::select('reports.*', 'church_attendances.total_attendance_1d', 'church_attendances.total_attendance_2d', 'church_attendances.total_attendance_sd')
+                        ->leftJoin('church_attendances', function($join) {
+                            $join->on('reports.cell_id', '=', 'church_attendances.cell_id')
+                                ->where('reports.date', '>=', DB::raw('church_attendances.start_date'))
+                                ->where('reports.date', '<=', DB::raw('church_attendances.end_date'));
+                        })
+                        ->whereIn('reports.cell_id', $cells)
+                        ->orderBy('reports.date', 'desc')
+                        ->paginate(10);
                     break;
                 case 'Pastor de Zona':
                     $zone = Zone::where('user_id', $user_id)->first();
                     $sector = Sector::where('zone_id', $zone->id)->pluck('id');
                     $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
-                    $reports = Report::whereIn('cell_id', $cells)->orderBy('id','desc')->paginate(10);
+                    $reports = Report::select('reports.*', 'church_attendances.total_attendance_1d', 'church_attendances.total_attendance_2d', 'church_attendances.total_attendance_sd')
+                        ->leftJoin('church_attendances', function($join) {
+                            $join->on('reports.cell_id', '=', 'church_attendances.cell_id')
+                                ->where('reports.date', '>=', DB::raw('church_attendances.start_date'))
+                                ->where('reports.date', '<=', DB::raw('church_attendances.end_date'));
+                        })
+                        ->whereIn('reports.cell_id', $cells)
+                        ->orderBy('reports.date', 'desc')
+                        ->paginate(10);
                     break;
                 case 'Pastor de Distrito':
                     $district = District::where('user_id', $user_id)->first();
                     $zone = Zone::where('district_id', $district->id)->pluck('id');
                     $sector = Sector::whereIn('zone_id', $zone)->pluck('id');
                     $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
-                    $reports = Report::whereIn('cell_id', $cells)->orderBy('id','desc')->paginate(10);
+                    $reports = Report::select('reports.*', 'church_attendances.total_attendance_1d', 'church_attendances.total_attendance_2d', 'church_attendances.total_attendance_sd')
+                        ->leftJoin('church_attendances', function($join) {
+                            $join->on('reports.cell_id', '=', 'church_attendances.cell_id')
+                                ->where('reports.date', '>=', DB::raw('church_attendances.start_date'))
+                                ->where('reports.date', '<=', DB::raw('church_attendances.end_date'));
+                        })
+                        ->whereIn('reports.cell_id', $cells)
+                        ->orderBy('reports.date', 'desc')
+                        ->paginate(10);
                     break;
                 case 'Pastor General':
                 case 'Anciano':

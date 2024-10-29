@@ -176,6 +176,7 @@
                                                                         <th></th>
                                                                         <th>Meta</th>
                                                                         <th>Acumulado</th>
+                                                                        <th>Actual</th>
                                                                         <th class="text-center">Avance</th>
                                                                     </tr>
                                                                 </thead>
@@ -190,6 +191,7 @@
                                                                             </div>
                                                                         </td>
                                                                         <td>{{ $goals->assistance }}</td>
+                                                                        <td>-</td>
                                                                         <td>{{ $goals_control->assistance ?? 0 }}</td>
                                                                         <td>
                                                                             <div class="d-flex align-center mx-40">
@@ -220,6 +222,7 @@
                                                                         </td>
                                                                         <td>{{ $goals->conversions }}</td>
                                                                         <td>{{ $goals_control->conversions ?? 0 }}</td>
+                                                                        <td>-</td>
                                                                         <td>
                                                                             <div class="d-flex align-center mx-40">
                                                                                 <div class="ratio-percentage me-15">{{ $goals_control->conversions_adv }}%
@@ -249,6 +252,7 @@
                                                                         </td>
                                                                         <td>{{ $goals->baptisms }}</td>
                                                                         <td>{{ $goals_control->baptisms ?? 0 }}</td>
+                                                                        <td>-</td>
                                                                         <td>
                                                                             <div class="d-flex align-center mx-40">
                                                                                 <div class="ratio-percentage me-15">{{ $goals_control->baptisms_adv }}%
@@ -277,6 +281,7 @@
                                                                         </td>
                                                                         <td>{{ $goals->programmed_visits }}</td>
                                                                         <td>{{ $goals_control->programmed_visits ?? 0 }}</td>
+                                                                        <td>-</td>
                                                                         <td>
                                                                             <div class="d-flex align-center mx-40">
                                                                                 <div class="ratio-percentage me-15">{{ $goals_control->programmed_visits_adv }}%

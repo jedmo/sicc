@@ -48,6 +48,29 @@
                     </td>
                 </tr>
                 @else
+                    @if (!empty($supervisor))
+                        <tr>
+                            <td class="pe-0">
+                                <div class="d-flex">
+                                    <div class="userDatatable__imgWrapper d-flex align-items-center m-0">
+                                        <div class="checkbox-group-wrapper">
+                                            <div class="checkbox-group d-flex">
+                                                <div class="checkbox-theme-default custom-checkbox checkbox-group__single d-flex">
+                                                    <input class="checkbox" type="checkbox" id="check-grp-{{ $supervisor->id }}" name="member_attendance[]" value="{{ $supervisor->id }}" {{  $supervision_attendance->exists && in_array($supervisor->id, $supervision_attendance->member_attendance) ? 'checked' : '' }}>
+                                                    <label for="check-grp-{{ $supervisor->id }}" class="ps-0"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="userDatatable-content d-inline-block">
+                                    <span>{{ $supervisor->full_name }}</span>
+                                </div>
+                            </td>
+                        </tr>
+                    @endif
                     @foreach ($members as $member)
                     <tr>
                         <td class="pe-0">
