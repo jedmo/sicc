@@ -29,57 +29,55 @@ class SupervisionAttendanceController extends Controller
         $attendances = [];
         $user_id = Auth::id();
         $role = Auth::user()->roles->pluck('name')[0];
+        $start_week = Carbon::now()->startOfWeek();
+        $existing = false;
+        $start_date = '';
 
         if (!empty($week)) {
             $dates = explode(' - ', $week);
             $start_date = Carbon::createFromFormat('d/m/Y', $dates[0])->format('Y-m-d');
             $end_date = Carbon::createFromFormat('d/m/Y', $dates[1])->format('Y-m-d');
-            switch ($role) {
-                case 'Supervisor':
-                    $sector = Sector::where('user_id', $user_id)->first();
-                    $attendances = SupervisionAttendance::where('sector_id', $sector->id)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
-                    break;
-                case 'Pastor de Zona':
-                    $zone = Zone::where('user_id', $user_id)->first();
-                    $attendances = SupervisionAttendance::where('zone_id', $zone->id)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
-                    break;
-                case 'Pastor de Distrito':
-                    $district = District::where('user_id', $user_id)->first();
-                    $zone = Zone::where('district_id', $district->id)->pluck('id');
-                    $attendances = SupervisionAttendance::whereIn('zone_id', $zone)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
-                    break;
-                case 'Pastor General':
-                case 'Anciano':
-                    $attendances = [];
-                    break;
-                default:
-                    $attendances = [];
-            }
-        } else {
-            switch ($role) {
-                case 'Supervisor':
-                    $sector = Sector::where('user_id', $user_id)->first();
-                    $attendances = SupervisionAttendance::where('sector_id', $sector->id)->orderBy('date','desc')->get();
-                    break;
-                case 'Pastor de Zona':
-                    $zone = Zone::where('user_id', $user_id)->first();
-                    $attendances = SupervisionAttendance::where('zone_id', $zone->id)->orderBy('date','desc')->get();
-                    break;
-                case 'Pastor de Distrito':
-                    $district = District::where('user_id', $user_id)->first();
-                    $zone = Zone::where('district_id', $district->id)->pluck('id');
-                    $attendances = SupervisionAttendance::whereIn('zone_id', $zone)->orderBy('date','desc')->get();
-                    break;
-                case 'Pastor General':
-                case 'Anciano':
-                    $attendances = [];
-                    break;
-                default:
-                    $attendances = [];
-            }
         }
 
-        return view('modules.supervision_attendances.index', compact('attendances', 'week'));
+        switch ($role) {
+            case 'Supervisor':
+                $sector = Sector::where('user_id', $user_id)->first();
+                if ($start_date) {
+                    $attendances = SupervisionAttendance::where('sector_id', $sector->id)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
+                } else {
+                    $attendances = SupervisionAttendance::where('sector_id', $sector->id)->orderBy('date','desc')->get();
+                }
+                $existing = SupervisionAttendance::where('sector_id', $sector->id)->whereDate('date', '>=', $start_week)->exists();
+                break;
+            case 'Pastor de Zona':
+                $zone = Zone::where('user_id', $user_id)->first();
+                if ($start_date) {
+                    $attendances = SupervisionAttendance::where('zone_id', $zone->id)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
+                } else {
+                    $attendances = SupervisionAttendance::where('zone_id', $zone->id)->orderBy('date','desc')->get();
+                }
+                $existing = SupervisionAttendance::where('zone_id', $zone->id)->whereDate('date', '>=', $start_week)->exists();
+                break;
+            case 'Pastor de Distrito':
+                $district = District::where('user_id', $user_id)->first();
+                $zones = Zone::where('district_id', $district->id)->pluck('id');
+                if ($start_date) {
+                    $attendances = SupervisionAttendance::whereIn('zone_id', $zones)->whereBetween('date', [$start_date, $end_date])->orderBy('date','desc')->get();
+                } else {
+                    $attendances = SupervisionAttendance::whereIn('zone_id', $zones)->orderBy('date','desc')->get();
+                }
+                $existing = SupervisionAttendance::whereIn('zone_id', $zones)->whereDate('date', '>=', $start_week)->exists();
+                break;
+            case 'Pastor General':
+            case 'Anciano':
+                $attendances = [];
+                break;
+            default:
+                $attendances = [];
+        }
+
+
+        return view('modules.supervision_attendances.index', compact('attendances', 'week', 'existing'));
     }
 
     /**
@@ -184,7 +182,7 @@ class SupervisionAttendanceController extends Controller
             default:
                 $members = [];
         }
-        $supervision_attendance['member_attendance'] = isset($supervision_attendance->member_attendance) ? json_decode($supervision_attendance->member_attendance) : [];
+        $supervision_attendance['member_attendance'] = isset($supervision_attendance->member_attendance) ? json_decode((string)$supervision_attendance->member_attendance) : [];
 
         return view('modules.supervision_attendances.edit', compact('zone_id','sector','members','supervision_attendance','supervisor'));
     }

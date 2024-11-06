@@ -39,3 +39,99 @@
 .ui-datepicker-calendar tbody td a.ui-state-hover {
   border: 1px solid var(--color-primary);
 }
+
+#full-calendar-event .fc-toolbar {
+  flex-wrap: wrap;
+}
+
+#full-calendar-event .fc-toolbar-chunk > div {
+  display: flex;
+  align-items: center;
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-today-button {
+  padding: 6.5px 15px;
+  text-transform: capitalize;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+  margin-right: 30px;
+  color: var(--color-gray);
+  background-color: var(--color-white);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button.fc-next-button, #full-calendar-event .fc-toolbar-chunk .fc-button.fc-prev-button {
+  padding: 0.25em 0.563em;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--color-white);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button.fc-next-button span.fc-icon, #full-calendar-event .fc-toolbar-chunk .fc-button.fc-prev-button span.fc-icon {
+  font-size: 14px;
+  margin-top: -4px;
+  color: var(--color-light);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-toolbar-title {
+  margin: 0 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-dark);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group {
+  border-radius: 0 4px 4px 0;
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button-primary {
+  background-color: var(--color-white);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button-primary.fc-button-active {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6.5px 13.68px;
+  text-transform: capitalize;
+  border: 1px solid var(--border-color);
+  color: var(--color-light);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button.fc-dayGridMonth-button {
+  border-radius: 0 4px 4px 0;
+  border-right: 1px solid var(--border-color);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button.fc-listMonth-button {
+  display: flex;
+  align-items: center;
+  border: 0 none;
+  margin-left: 0;
+  color: var(--color-light);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button.fc-listMonth-button i, #full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button.fc-listMonth-button img, #full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button.fc-listMonth-button svg {
+  font-size: 15px;
+  min-width: 14px;
+  margin-right: 6px;
+  color: var(--color-primary);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button.fc-listMonth-button.fc-button-active {
+  background-color: var(--color-white);
+  color: var(--color-primary);
+}
+
+#full-calendar-event .fc-toolbar-chunk .fc-button-group .fc-button:focus {
+  outline: 0;
+  box-shadow: 0 0;
+}

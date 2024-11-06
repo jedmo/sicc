@@ -32,16 +32,14 @@ class ChurchAttendanceController extends Controller
         $role = Auth::user()->roles->pluck('name')[0];
         $start_week = Carbon::now()->startOfWeek();
         $existing = false;
+        $start_date = '';
 
         if ($role == 'Líder') {
             $cell = Cell::where('user_leader_id', $user_id)->first();
             $church_attendances = ChurchAttendance::where('cell_id', $cell->id)->orderBy('start_date','desc')->get();
             $existing = ChurchAttendance::where('cell_id', $cell->id)->whereDate('start_date', '>=', $start_week)->exists();
         } else {
-            if (empty($week)) {
-                $start_date = Carbon::now()->startOfWeek()->toDateString();
-                $end_date   = Carbon::now()->endOfWeek()->toDateString();
-            } else {
+            if (!empty($week)) {
                 $dates = explode(' - ', $week);
                 $start_date = Carbon::createFromFormat('d/m/Y', $dates[0])->format('Y-m-d');
                 $end_date = Carbon::createFromFormat('d/m/Y', $dates[1])->format('Y-m-d');
@@ -50,18 +48,26 @@ class ChurchAttendanceController extends Controller
                 case 'Supervisor':
                     $sector = Sector::where('user_id', $user_id)->first();
                     $cells = Cell::where('sector_id', $sector->id)->pluck('id');
-                    $church_attendances = ChurchAttendance::where('start_date', $start_date)->where('end_date', $end_date)->whereIn('cell_id', $cells)->orderBy('start_date','desc')->get();
+                    if ($start_date) {
+                        $church_attendances = ChurchAttendance::where('start_date', $start_date)->where('end_date', $end_date)->whereIn('cell_id', $cells)->orderBy('start_date','desc')->get();
+                    } else {
+                        $church_attendances = ChurchAttendance::whereIn('cell_id', $cells)->orderBy('start_date','desc')->get();
+                    }
                     $existing = ChurchAttendance::whereIn('cell_id', $cells)->whereDate('start_date', '>=', $start_week)->exists();
                     break;
                 case 'Pastor de Zona':
                     $zone = Zone::where('user_id', $user_id)->first();
                     $sector = Sector::where('zone_id', $zone->id)->pluck('id');
                     $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
-                    $church_att = ChurchAttendance::where('start_date', $start_date)->where('end_date', $end_date)->whereIn('cell_id', $cells)->orderBy('start_date','desc')->get();
+                    if ($start_date) {
+                        $church_att = ChurchAttendance::where('start_date', $start_date)->where('end_date', $end_date)->whereIn('cell_id', $cells)->orderBy('start_date','desc')->get();
+                    } else {
+                        $church_att = ChurchAttendance::whereIn('cell_id', $cells)->orderBy('start_date','desc')->get();
+                    }
                     $existing = ChurchAttendance::whereIn('cell_id', $cells)->whereDate('start_date', '>=', $start_week)->exists();
 
                     $church_attendances = $church_att->groupBy(function ($attendance) {
-                        return $attendance->cell->sector->id;
+                        return $attendance->cell->sector->id . '|' . $attendance->start_date;
                     })->map(function ($attendances, $sector_id) {
                         $sector = $attendances->first()->cell->sector;
                         $attendanceSummary = new ChurchAttendance();

@@ -6,6 +6,7 @@ use App\Http\Controllers\CellMemberController;
 use App\Http\Controllers\ChurchAttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistrictController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PaginationController;
@@ -53,6 +54,7 @@ Route::group(['middleware'=>'auth'],function(){
     Route::resource('roles',  RoleController::class);
     Route::resource('church-attendances',  ChurchAttendanceController::class);
     Route::resource('supervision-attendances',  SupervisionAttendanceController::class);
+    Route::resource('events',  EventController::class);
     Route::get('/trackings/create/{member_id}', TrackingController::class . '@create')->name('trackings.create');
     Route::post('/trackings', TrackingController::class .'@store')->name('trackings.store');
     Route::get('/trackings/{member_id}', TrackingController::class . '@show')->name('trackings.show');

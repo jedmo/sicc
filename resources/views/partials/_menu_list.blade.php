@@ -104,6 +104,14 @@
     </a>
 </li>
 @endhasanyrole
+@hasanyrole('Pastor de Zona|Pastor de Distrito|Pastor General|Anciano|Administrador')
+<li>
+    <a href="{{ route('events.index') }}" class="{{ Request::is('events') || Request::is('events/*') ? 'active':'' }}">
+        <span class="nav-icon uil uil-calendar-alt"></span>
+        <span class="menu-text">Eventos</span>
+    </a>
+</li>
+@endhasanyrole
 @hasrole('Administrador')
 <li>
     <a href="{{ route('users.index') }}" class="{{ Request::is('users') || Request::is('users/*') ? 'active':'' }}">

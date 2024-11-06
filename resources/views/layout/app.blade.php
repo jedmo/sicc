@@ -52,5 +52,6 @@
     <script src="{{ asset('assets/js/script.min.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
     {{-- <script src="{{ asset('js/app.min.js') }}"></script> --}}
+    @yield('script')
 </body>
 </html>

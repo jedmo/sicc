@@ -2,7 +2,7 @@
 
     <div class="card border-0 px-25 h-100">
         <div class="card-header px-0 border-0">
-            <h6>Porcentaje de asistencia</h6>
+            <h6>Porcentaje de asistencia última semana</h6>
         </div>
         <div class="p-0 card-body">
             <div class="revenueSourceChart px-0">

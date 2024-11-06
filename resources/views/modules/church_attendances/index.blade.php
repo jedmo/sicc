@@ -1,18 +1,10 @@
 @extends('layout.app')
 @section('content')
     <div class="container-fluid">
-        <div class="alert-icon-big alert alert-info mt-30" role="alert">
-            <div class="alert-icon">
-                <img src="{{ asset('assets/img/svg/layers.svg') }}" alt="layers" class="svg">
-            </div>
-            <div class="alert-content">
-                <p>Solo se permite agregar o actualizar la asistencia al templo de la semana actual.</p>
-            </div>
-        </div>
         @hasanyrole('Líder|Supervisor|Administrador')
             <div class="row">
                 @if (!$existing)
-                <div class="col-lg-12">
+                <div class="col-lg-2">
                     <div class="contact-breadcrumb">
                         <div class="breadcrumb-main add-contact justify-content-sm-between ">
                             <div class="action-btn mt-sm-0 mt-15">
@@ -24,6 +16,16 @@
                     </div>
                 </div>
                 @endif
+                <div class="col-lg-10">
+                    <div class="alert-icon-big alert alert-info mt-15 mb-0" role="alert">
+                        <div class="alert-icon">
+                            <img src="{{ asset('assets/img/svg/layers.svg') }}" alt="layers" class="svg">
+                        </div>
+                        <div class="alert-content">
+                            <p>Solo se permite agregar o actualizar la asistencia al templo de la semana actual.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         @endhasanyrole
         <div class="row">
@@ -64,6 +66,8 @@
                                 </div>
                             </div>
                         @endif
+                    </div>
+                    <div class="card-body">
                         <div class="userDatatable global-shadow border-light-0 w-100">
                             <div class="table-responsive">
                                 <table class="table mb-0 table-borderless">

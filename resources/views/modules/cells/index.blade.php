@@ -57,11 +57,9 @@
                                             <th>
                                                 <span class="userDatatable-title">Estado</span>
                                             </th>
-                                            @hasanyrole('Administrador|Supervisor|Pastor de Zona')
                                             <th>
                                                 <span class="userDatatable-title float-end">Acciones</span>
                                             </th>
-                                            @endhasanyrole
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -107,7 +105,6 @@
                                                             </span>
                                                         </div>
                                                     </td>
-                                                    @hasanyrole('Administrador|Supervisor|Pastor de Zona')
                                                     <td>
                                                         <ul class="orderDatatable_actions mb-0 d-flex flex-wrap">
                                                             <li>
@@ -115,11 +112,13 @@
                                                                     <i class="uil uil-eye"></i>
                                                                 </a>
                                                             </li>
+                                                            @hasanyrole('Administrador|Supervisor|Pastor de Zona')
                                                             <li>
                                                                 <a href="{{ route('cells.edit', $cell->id) }}" class="edit">
                                                                     <i class="uil uil-edit"></i>
                                                                 </a>
                                                             </li>
+                                                            @endhasanyrole
                                                             {{-- <li>
                                                                 <a
                                                                     href="#"
@@ -143,7 +142,6 @@
                                                             </li> --}}
                                                         </ul>
                                                     </td>
-                                                    @endhasanyrole
                                                 </tr>
                                             @endforeach
                                         @endif
