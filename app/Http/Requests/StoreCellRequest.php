@@ -40,6 +40,9 @@ class StoreCellRequest extends FormRequest
             'hamlet' => '',
             'municipal_district_id' => '',
             'sector_id' => '',
+            'child_attendance' => '',
+            'young_attendance' => '',
+            'adult_attendance' => '',
         ];
     }
 

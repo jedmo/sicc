@@ -2435,7 +2435,7 @@ if (graphContainer) {
   graphContainer = graphContainer.parentNode;
   if (isElementInViewport(graphContainer)) {
     var assistance = [];
-    axios.get("/report/assistance", {
+    axios.get("/report/attendance", {
       withCredentials: true
     }).then(function (response) {
       console.log(response);

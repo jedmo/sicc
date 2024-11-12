@@ -22,7 +22,19 @@
             <div class="col-lg-12 mb-30">
                 <div class="card">
                     <div class="card-header color-dark fw-500">
-                        Reporte de célula
+                        <h4>Reporte de célula</h4>
+                        <div class="card-extra">
+                            <div class="dropdown  dropdown-click ">
+                                <a class="btn btn-primary" href="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Exportar
+                                    <img src="{{ asset('assets/img/svg/chevron-down.svg') }}" alt="chevron-down" class="svg">
+                                </a>
+                                <div class="dropdown-default dropdown-menu">
+                                    <a class="dropdown-item" href="#">Excel</a>
+                                    <a class="dropdown-item" href="{{ route('report.pdf', 735) }}" target="_blank">PDF</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         @unlessrole('Líder')
@@ -86,7 +98,7 @@
                                             <th colspan="3" rowspan="2" class="text-center">
                                                 <span class="userDatatable-title">Ofrendas</span>
                                             </th>
-                                            <th colspan="2" rowspan="2" class="text-center">
+                                            <th colspan="4" rowspan="2" class="text-center">
                                                 <span class="userDatatable-title">Resultados</span>
                                             </th>
                                             <th colspan="3" rowspan="2" class="text-center">
@@ -156,6 +168,12 @@
                                                 <span class="userDatatable-title">Rec.</span>
                                             </th>
                                             <th>
+                                                <span class="userDatatable-title">Visitas Prog.</span>
+                                            </th>
+                                            <th>
+                                                <span class="userDatatable-title">Bautismos en Agua</span>
+                                            </th>
+                                            <th>
                                                 <span class="userDatatable-title">D1</span>
                                             </th>
                                             <th>
@@ -175,7 +193,6 @@
                                             </tr>
                                         @else
                                             @foreach ($reports as $report)
-
                                                 <tr>
                                                     @hasanyrole('Supervisor|Pastor de Zona')
                                                     <td>
@@ -271,6 +288,16 @@
                                                     </td>
                                                     <td>
                                                         <div class="userDatatable-content d-inline-block">
+                                                            <span>{{ $report->programmed_visits }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="userDatatable-content d-inline-block">
+                                                            <span>{{ $report->water_baptisms }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="userDatatable-content d-inline-block">
                                                             <span>{{ $report->total_attendance_1d }}</span>
                                                         </div>
                                                     </td>
@@ -284,39 +311,41 @@
                                                             <span>{{ $report->total_attendance_sd }}</span>
                                                         </div>
                                                     </td>
-                                                    @hasanyrole('Líder|Supervisor|Administrador')
-                                                        <td>
-                                                            <ul class="orderDatatable_actions mb-0 d-flex flex-wrap">
-                                                                <li>
-                                                                    <a href="{{ route('reports.edit', $report->id) }}"
-                                                                        class="edit">
-                                                                        <i class="uil uil-edit"></i>
-                                                                    </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a
-                                                                        href="#"
-                                                                        class="remove"
-                                                                        onclick="
-                                                                            event.preventDefault();
-                                                                            if ( confirm('¿Desea eliminar el reporte?') ) {
-                                                                                document.getElementById( 'delete-{{ $report->id }}' ).submit();
-                                                                            }
-                                                                        "
-                                                                    >
-                                                                        <i class="uil uil-trash-alt"></i>
-                                                                    </a>
+                                                    @if (\Carbon\Carbon::parse($report->date)->toDate() >= $limit_date)
+                                                        @hasanyrole('Líder|Supervisor|Administrador')
+                                                            <td>
+                                                                <ul class="orderDatatable_actions mb-0 d-flex flex-wrap">
+                                                                    <li>
+                                                                        <a href="{{ route('reports.edit', $report->id) }}"
+                                                                            class="edit">
+                                                                            <i class="uil uil-edit"></i>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a
+                                                                            href="#"
+                                                                            class="remove"
+                                                                            onclick="
+                                                                                event.preventDefault();
+                                                                                if ( confirm('¿Desea eliminar el reporte?') ) {
+                                                                                    document.getElementById( 'delete-{{ $report->id }}' ).submit();
+                                                                                }
+                                                                            "
+                                                                        >
+                                                                            <i class="uil uil-trash-alt"></i>
+                                                                        </a>
 
-                                                                    <form style="display:none;" id="delete-{{ $report->id }}"
-                                                                        action="{{ route('reports.destroy', $report->id) }}"
-                                                                        method="POST">
-                                                                        @csrf
-                                                                        @method('delete')
-                                                                    </form>
-                                                                </li>
-                                                            </ul>
-                                                        </td>
-                                                    @endhasanyrole
+                                                                        <form style="display:none;" id="delete-{{ $report->id }}"
+                                                                            action="{{ route('reports.destroy', $report->id) }}"
+                                                                            method="POST">
+                                                                            @csrf
+                                                                            @method('delete')
+                                                                        </form>
+                                                                    </li>
+                                                                </ul>
+                                                            </td>
+                                                        @endhasanyrole
+                                                    @endif
                                                 </tr>
                                             @endforeach
                                         @endif

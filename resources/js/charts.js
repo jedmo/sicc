@@ -16,9 +16,8 @@ if (graphContainer) {
     if (isElementInViewport(graphContainer)) {
         var assistance = [];
 
-        axios.get("/report/assistance", { withCredentials: true })
+        axios.get("/report/attendance", { withCredentials: true })
         .then((response) => {
-            console.log(response);
             assistance = response.data.assistance;
             dates = response.data.dates;
             attendance = response.data.attendance;

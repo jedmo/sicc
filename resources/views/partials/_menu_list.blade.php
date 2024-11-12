@@ -43,6 +43,15 @@
         <span class="menu-text">Miembros</span>
     </a>
 </li>
+@hasrole('Líder')
+<li>
+    <a href="{{ route('reports.index') }}" class="{{ Request::is('reports') || Request::is('reports/*') ? 'active':'' }}">
+        <span class="nav-icon uil uil-chart"></span>
+        <span class="menu-text">Reporte de célula</span>
+    </a>
+</li>
+@endhasrole
+@unlessrole('Líder')
 <li class="has-child {{ Request::is('reports') || Request::is('report/*') ? 'open':'' }}">
     <a href="#" class="{{ Request::is('reports') || Request::is('report/*') ? 'active':'' }}">
         <span class="nav-icon uil uil-chart"></span>
@@ -90,6 +99,7 @@
         </li>
     </ul>
 </li>
+@endunlessrole
 <li>
     <a href="{{ route('church-attendances.index') }}" class="{{ Request::is('church-attendances') || Request::is('church-attendances/*') ? 'active':'' }}">
         <span class="nav-icon uil uil-house-user"></span>
@@ -112,6 +122,12 @@
     </a>
 </li>
 @endhasanyrole
+<li>
+    <a href="{{ route('supports.index') }}" class="{{ Request::is('supports') || Request::is('supports/*') ? 'active':'' }}">
+        <span class="nav-icon uil uil-question-circle"></span>
+        <span class="menu-text">Atención y Ayuda</span>
+    </a>
+</li>
 @hasrole('Administrador')
 <li>
     <a href="{{ route('users.index') }}" class="{{ Request::is('users') || Request::is('users/*') ? 'active':'' }}">

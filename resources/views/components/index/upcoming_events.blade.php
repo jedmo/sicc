@@ -17,51 +17,17 @@
                     </tr>
                   </thead>
                   <tbody>
+                    @foreach ($last_week_data['events'] as $event)
                     <tr>
                       <td>
                         <div class="selling-product-img d-flex align-items-center">
-                          <img class="radius-xs img-fluid order-bg-opacity-primary" src="{{ asset('assets/img/giorgio.png') }}" alt="img">
-                          <span>Evento General de Mujeres</span>
-                        </div>
+                          <img class="radius-xs img-fluid order-bg-opacity-primary" src="{{ asset('assets/img/'.$event->image) }}" alt="img">
+                          <span>{{ $event->name }}</span>
+                        </img>
                       </td>
-                      <td>01-may-2024</td>
+                      <td>{{ Carbon\Carbon::parse($event->start_date)->format('d-M-Y') }}</td>
                     </tr>
-                    <tr>
-                      <td>
-                        <div class="selling-product-img d-flex align-items-center">
-                          <img class="radius-xs img-fluid order-bg-opacity-primary" src="{{ asset('assets/img/headphone.png') }}" alt="img">
-                          <span>Ayuno</span>
-                        </div>
-                      </td>
-                      <td>09-may-2024</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="selling-product-img d-flex align-items-center">
-                          <img class="radius-xs img-fluid order-bg-opacity-primary" src="{{ asset('assets/img/shoes.png') }}" alt="img">
-                          <span>Vigilia</span>
-                        </div>
-                      </td>
-                      <td>16-may-2024</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="selling-product-img d-flex align-items-center">
-                          <img class="radius-xs img-fluid order-bg-opacity-primary" src="{{ asset('assets/img/mac-pro.png') }}" alt="img">
-                          <span>Culto juvenil</span>
-                        </div>
-                      </td>
-                      <td>07-jun-2024</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="selling-product-img d-flex align-items-center">
-                          <img class="radius-xs img-fluid order-bg-opacity-primary" src="{{ asset('assets/img/creativ-bag.png') }}" alt="img">
-                          <span>Evento para hombres</span>
-                        </div>
-                      </td>
-                      <td>17-jun-2024</td>
-                    </tr>
+                    @endforeach
                   </tbody>
                 </table>
               </div>

@@ -10,15 +10,17 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PaginationController;
+use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\SupervisionAttendanceController;
-use App\Http\Controllers\SupervisionMettingAttendanceController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZoneController;
 use Illuminate\Support\Facades\Route;
+
 
 
 /*
@@ -55,6 +57,7 @@ Route::group(['middleware'=>'auth'],function(){
     Route::resource('church-attendances',  ChurchAttendanceController::class);
     Route::resource('supervision-attendances',  SupervisionAttendanceController::class);
     Route::resource('events',  EventController::class);
+    Route::resource('supports',  SupportController::class);
     Route::get('/trackings/create/{member_id}', TrackingController::class . '@create')->name('trackings.create');
     Route::post('/trackings', TrackingController::class .'@store')->name('trackings.store');
     Route::get('/trackings/{member_id}', TrackingController::class . '@show')->name('trackings.show');
@@ -70,10 +73,11 @@ Route::group(['middleware'=>'auth'],function(){
     Route::get('/report/general', ReportController::class .'@general')->name('reports.general');
     Route::get('/report/stat-general', ReportController::class .'@statGeneral')->name('reports.stat-general');
     // Route::get('/cell-members/filter/{sector_id}', CellMemberController::class .'@index')->name('cell-members.search');
+    Route::get('/report/pdf/{sector_id}', PDFController::class .'@generatePDF')->name('report.pdf');
 
     Route::get('/report/graph-show', [ReportController::class,'graphShow'])->name('reports.graph-show');
     Route::get('/cell_members/list/{cell_id}', [CellMemberController::class,'list'])->name('cell_members.list');
-    Route::get('/report/assistance', [ReportController::class,'assistance'])->name('reports.assistance');
+    Route::get('/report/attendance', [ReportController::class,'attendance'])->name('reports.attendance');
 });
 /************************ Custom Routes Ends ******************************/
 

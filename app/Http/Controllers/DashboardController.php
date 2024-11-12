@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cell;
 use App\Models\CellMember;
 use App\Models\District;
+use App\Models\Event;
 use App\Models\Goal;
 use App\Models\GoalControl;
 use App\Models\Member;
@@ -31,26 +32,42 @@ class DashboardController extends Controller {
         $role = Auth::user()->roles->pluck('name')[0];
         $last_week_data = $this->getLastWeekData($user_id, $role);
 
-        return view('pages.dashboard.index',compact('title','description','last_week_data'));
+        $e_date = Carbon::parse($last_week_data['events'][0]->start_date);
+        $q = now()->diffInDays($e_date, false);
+        $n_event = $last_week_data['events'][0];
+
+        return view('pages.dashboard.index',compact('title','description','last_week_data', 'n_event', 'q'));
     }
 
     public function getLastWeekData($user_id, $role)
     {
         $startWeek = Carbon::now()->subWeek()->startOfWeek();
         $endWeek   = Carbon::now()->subWeek()->endOfWeek();
+        $g_events = Event::where('type', 'general')->whereDate('start_date', '>=', Carbon::now())->get();
+        $z_events = [];
+        $d_events = [];
 
         switch ($role) {
             case 'Líder':
                 $cell = Cell::where('user_leader_id', $user_id)->first();
+                $sector = Sector::find($cell['sector_id']);
+                $z_events = Event::where('zone_id', $sector['zone_id'])->where('type', 'zona')->whereDate('start_date', '>=', Carbon::now())->get();
+                $zone = Zone::find($sector['zone_id'])->first();
+                $d_events = Event::where('zone_id', '')->where('type', 'distrito')->where('district_id', $zone['district_id'])->whereDate('start_date', '>=', Carbon::now())->get();
                 break;
             case 'Supervisor':
                 $sector = Sector::where('user_id', $user_id)->first();
                 $cells = Cell::where('sector_id', $sector->id)->pluck('id');
+                $z_events = Event::where('zone_id', $sector['zone_id'])->where('type', 'zona')->whereDate('start_date', '>=', Carbon::now())->get();
+                $zone = Zone::find($sector['zone_id'])->first();
+                $d_events = Event::where('zone_id', '')->where('type', 'distrito')->where('district_id', $zone['district_id'])->whereDate('start_date', '>=', Carbon::now())->get();
                 break;
             case 'Pastor de Zona':
                 $zone = Zone::where('user_id', $user_id)->first();
                 $sector = Sector::whereIn('zone_id', $zone)->pluck('id');
                 $cells = Cell::whereIn('sector_id', $sector)->pluck('id');
+                $z_events = Event::where('zone_id', $zone->id)->where('type', 'zona')->whereDate('start_date', '>=', Carbon::now())->get();
+                $d_events = Event::where('district_id', $zone->district_id)->where('type', 'distrito')->whereDate('start_date', '>=', Carbon::now())->get();
                 break;
             case 'Pastor de Distrito':
                 $district = District::where('user_id', $user_id)->first();
@@ -104,9 +121,12 @@ class DashboardController extends Controller {
 
             $members = Member::whereHas('cell', function ($query) use ($cells) {
                 $query->whereIn('cell_id', $cells);
-            })->where('status', 1)->paginate(5);
+            })->where('status', 1)->get();
         }
 
-        return compact('total_attendance', 'church_offering', 'total_adult_attendance', 'total_youth_attendance', 'total_children_attendance', 'goals_control', 'members');
+        $_events = $g_events->merge($d_events)->merge($z_events);
+        $events = $_events->sortBy('start_date');
+
+        return compact('total_attendance', 'church_offering', 'total_adult_attendance', 'total_youth_attendance', 'total_children_attendance', 'goals_control', 'members', 'events');
     }
 }

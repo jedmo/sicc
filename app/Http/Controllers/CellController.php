@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCellRequest;
 use App\Http\Requests\UpdateCellRequest;
 use App\Models\Address;
 use App\Models\Cell;
+use App\Models\CellInitialData;
 use App\Models\CellMember;
 use App\Models\Goal;
 use App\Models\GoalControl;
@@ -61,14 +62,21 @@ class CellController extends Controller
     {
         $request->validated();
         $address_input = $request->safe()->only(['address', 'house_num', 'street', 'canton', 'hamlet', 'municipal_district_id']);
-        $cell_input = $request->safe()->except(['address', 'house_num', 'street', 'canton', 'hamlet', 'municipal_district_id', 'sector_code']);
+        $initial_input = $request->safe()->only(['child_attendance', 'young_attendance', 'adult_attendance']);
+        $cell_input = $request->safe()->except(['address', 'house_num', 'street', 'canton', 'hamlet', 'municipal_district_id', 'sector_code','child_attendance', 'young_attendance', 'adult_attendance']);
 
         $address = Address::create($address_input);
         $cell_input['address_id'] = $address->id;
 
         $code = $request->input('code');
         $cell_input['full_code'] = $request->input('sector_code') . ' C:' . $code;
-        Cell::create($cell_input);
+        $cell = Cell::create($cell_input);
+
+        $goal = Goal::latest()->first();
+        $initial_input['cell_id'] = $cell->id;
+        $initial_input['goal_id'] = $goal->id;
+        $initial_input['initial_date'] = Carbon::now()->toDateString();
+        CellInitialData::create($initial_input);
 
         return redirect()->route('cells.index')->with('success','La célula ha sido creada exitosamente.');
     }
@@ -98,7 +106,9 @@ class CellController extends Controller
         $goals_control['baptisms_adv'] = ((int)$goals_control->baptisms / (int)$goals['baptisms']) * 100;
         $goals_control['programmed_visits_adv'] = ((int)$goals_control->programmed_visits / (int)$goals['programmed_visits']) * 100;
 
-        return view('modules.cells.show',compact('cell', 'members', 'municipalities', 'show', 'goals', 'goals_control'));
+        $initial = CellInitialData::where('cell_id', $cell->id)->first();
+
+        return view('modules.cells.show',compact('cell', 'members', 'municipalities', 'show', 'goals', 'goals_control', 'initial'));
     }
 
     /**
@@ -110,9 +120,10 @@ class CellController extends Controller
     public function edit(Cell $cell)
     {
         $members = CellMember::where('cell_id', $cell->id)->with('member')->get();
+        $initial = CellInitialData::where('cell_id', $cell->id)->firstOrNew();
         $show = 0;
         $municipalities = MunicipalDistrict::all();
-        return view('modules.cells.edit',compact('cell', 'members', 'municipalities', 'show'));
+        return view('modules.cells.edit',compact('cell', 'members', 'municipalities', 'initial', 'show'));
     }
 
     /**
@@ -126,7 +137,8 @@ class CellController extends Controller
     {
         $request->validated();
         $address_input = $request->safe()->only(['address', 'house_num', 'street', 'canton', 'hamlet', 'municipal_district_id']);
-        $cell_input = $request->safe()->except(['address', 'house_num', 'street', 'canton', 'hamlet', 'municipal_district_id', 'sector_code']);
+        $initial_input = $request->safe()->only(['child_attendance', 'young_attendance', 'adult_attendance']);
+        $cell_input = $request->safe()->except(['address', 'house_num', 'street', 'canton', 'hamlet', 'municipal_district_id', 'sector_code', 'child_attendance', 'young_attendance', 'adult_attendance']);
 
         $address_id = $cell['address_id'];
         $address = Address::find($address_id);
@@ -135,6 +147,16 @@ class CellController extends Controller
         $code = $request->input('code');
         $cell_input['full_code'] = $request->input('sector_code') . ' C:' . $code;
         $cell->fill($cell_input)->save();
+        $initial = CellInitialData::find($cell->id);
+        if ($initial) {
+            $initial->fill($initial_input)->save();
+        } else {
+            $goal = Goal::latest()->first();
+            $initial_input['cell_id'] = $cell->id;
+            $initial_input['goal_id'] = $goal->id;
+            $initial_input['initial_date'] = Carbon::now()->toDateString();
+            CellInitialData::create($initial_input);
+        }
 
         return redirect()->route('cells.index')->with('success','La célula ha sido actualizada con éxito');
     }

@@ -32,8 +32,10 @@ class ReportController extends Controller
         $cell_id = request('cell_id');
         $reports = $this->getReportData($cell_id);
         $cells = $this->getCells();
+        $limit_date = Carbon::now()->subMonth()->toDate();
+        // dd($limit_date);
 
-        return view('modules.reports.index', compact('reports', 'cells', 'cell_id'));
+        return view('modules.reports.index', compact('reports', 'cells', 'cell_id', 'limit_date'));
     }
 
     /**
@@ -847,7 +849,7 @@ class ReportController extends Controller
         return ReportResource::make($report);
     }
 
-    public function assistance()
+    public function attendance()
     {
         $start_week = Carbon::now()->subWeek()->startOfWeek();
         $end_week   = Carbon::now()->subWeek()->endOfWeek();
@@ -893,7 +895,9 @@ class ReportController extends Controller
 
             $graph = Report::where('cell_id', $cell->id)->orderBy('date', 'desc')->take(12)->get();
             foreach($graph as $r) {
-                array_push($dates, $r->date);
+                $s_week = Carbon::createFromDate($r->date)->startOfWeek()->format('d/M');
+                $e_week = Carbon::createFromDate($r->date)->endOfWeek()->format('d/M');
+                array_push($dates, $s_week . '-' . $e_week);
                 array_push($attendance, $r->total_attendance);
             }
         } else {
@@ -905,7 +909,9 @@ class ReportController extends Controller
 
             $graph = Report::whereIn('cell_id', $cells)->orderBy('date', 'desc')->take(12)->get();
             foreach($graph as $r) {
-                array_push($dates, $r->date);
+                $s_week = Carbon::createFromDate($r->date)->startOfWeek()->format('d/M');
+                $e_week = Carbon::createFromDate($r->date)->endOfWeek()->format('d/M');
+                array_push($dates, $s_week . '-' . $e_week);
                 array_push($attendance, $r->total_attendance);
             }
         }

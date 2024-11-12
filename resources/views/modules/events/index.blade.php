@@ -68,7 +68,7 @@
         @endforeach
         ],
         className: "primary",
-        textColor: "#5F63F2"
+        textColor: "#FFFFFF"
     }
     //   , i = {
     //     id: 4,

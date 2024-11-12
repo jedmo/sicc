@@ -11,6 +11,18 @@
                             <h5>{{ $sectors['full_code'] }}</h5>
                         </div>
                         @endhasrole
+                        <div class="card-extra">
+                            <div class="dropdown  dropdown-click ">
+                                <a class="btn btn-primary" href="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Exportar
+                                    <img src="{{ asset('assets/img/svg/chevron-down.svg') }}" alt="chevron-down" class="svg">
+                                </a>
+                                <div class="dropdown-default dropdown-menu">
+                                    <a class="dropdown-item" href="#">Excel</a>
+                                    <a class="dropdown-item" href="#">PDF</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="tab-wrapper">

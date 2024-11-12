@@ -33,20 +33,20 @@ class EventController extends Controller
             case 'Líder':
                 $cell = Cell::where('user_leader_id', $user_id)->first();
                 $sector = Sector::find($cell['sector_id']);
-                $z_events = Event::where('zone_id', $sector['zone_id'])->whereDate('start_date', '>=', Carbon::now())->get();
+                $z_events = Event::where('zone_id', $sector['zone_id'])->where('type', 'zona')->whereDate('start_date', '>=', Carbon::now())->get();
                 $zone = Zone::where('zone_id', $sector['zone_id'])->first();
-                $d_events = Event::where('zone_id', '')->where('district_id', $zone['district_id'])->whereDate('start_date', '>=', Carbon::now())->get();
+                $d_events = Event::where('zone_id', '')->where('type', 'distrito')->where('district_id', $zone['district_id'])->whereDate('start_date', '>=', Carbon::now())->get();
                 break;
             case 'Supervisor':
                 $sector = Sector::where('user_id', $user_id)->first();
-                $z_events = Event::where('zone_id', $sector['zone_id'])->whereDate('start_date', '>=', Carbon::now())->get();
+                $z_events = Event::where('zone_id', $sector['zone_id'])->where('type', 'zona')->whereDate('start_date', '>=', Carbon::now())->get();
                 $zone = Zone::where('zone_id', $sector['zone_id'])->first();
-                $d_events = Event::where('zone_id', '')->where('district_id', $zone['district_id'])->whereDate('start_date', '>=', Carbon::now())->get();
+                $d_events = Event::where('zone_id', '')->where('type', 'distrito')->where('district_id', $zone['district_id'])->whereDate('start_date', '>=', Carbon::now())->get();
                 break;
             case 'Pastor de Zona':
                 $zone = Zone::where('user_id', $user_id)->first();
-                $z_events = Event::where('zone_id', $zone->id)->whereDate('start_date', '>=', Carbon::now())->get();
-                $d_events = Event::where('zone_id', '')->where('district_id', $zone->district_id)->whereDate('start_date', '>=', Carbon::now())->get();
+                $z_events = Event::where('zone_id', $zone->id)->where('type', 'zona')->whereDate('start_date', '>=', Carbon::now())->get();
+                $d_events = Event::where('district_id', $zone->district_id)->where('type', 'distrito')->whereDate('start_date', '>=', Carbon::now())->get();
                 break;
             case 'Pastor de Distrito':
                 $district = District::where('user_id', $user_id)->first();

@@ -164,7 +164,45 @@
                                             </div>
                                         </div>
                                         <div class="col-xxl-9 col-lg-8 mb-25">
-                                            <div class="card border-0 px-25 h-100">
+                                            <div class="card border-0 px-25 h-40">
+                                                <div class="card-header px-0 border-0">
+                                                    <h6>Datos de inicio</h6>
+                                                </div>
+                                                <div class="card-body p-0">
+                                                    <div class="selling-table-wrap selling-table-wrap--source">
+                                                        <div class="table-responsive">
+                                                            <table class="table table--default table-borderless">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th></th>
+                                                                        <th>Niños</th>
+                                                                        <th>Jovenes</th>
+                                                                        <th>Adultos</th>
+                                                                        <th>Total</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="selling-product-img d-flex align-items-center">
+                                                                                <div class="selling-product-img-wrapper order-bg-opacity-primary">
+                                                                                    <i class="uil uil-users-alt"></i>
+                                                                                </div>
+                                                                                <span>Asistencia</span>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{{ $initial ? $initial->child_attendance : '-' }}</td>
+                                                                        <td>{{ $initial ? $initial->young_attendance : '-' }}</td>
+                                                                        <td>{{ $initial ? $initial->adult_attendance : '-' }}</td>
+                                                                        <td>{{ $initial ? $initial->child_attendance + $initial->young_attendance + $initial->adult_attendance : '-' }}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card border-0 px-25 h-60">
                                                 <div class="card-header px-0 border-0">
                                                     <h6>Resultados</h6>
                                                 </div>
