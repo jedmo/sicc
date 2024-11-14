@@ -25,9 +25,9 @@
                         <h4>Reporte de célula</h4>
                         <div class="card-extra">
                             <div class="dropdown  dropdown-click ">
-                                <a class="btn btn-primary" href="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="btn btn-outline-primary" href="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="las la-angle-down"></i>
                                     Exportar
-                                    <img src="{{ asset('assets/img/svg/chevron-down.svg') }}" alt="chevron-down" class="svg">
                                 </a>
                                 <div class="dropdown-default dropdown-menu">
                                     <a class="dropdown-item" href="#">Excel</a>
@@ -208,7 +208,7 @@
                                                     @endhasanyrole
                                                     <td>
                                                         <div class="userDatatable-content d-inline-block text-nowrap">
-                                                            <span>{{ $report->date }}</span>
+                                                            <span>{{ Carbon\Carbon::parse($report->date)->format('d-m-y') }}</span>
                                                         </div>
                                                     </td>
                                                     <td>

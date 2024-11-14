@@ -234,14 +234,14 @@
                                                                         <td>{{ $goals_control->assistance ?? 0 }}</td>
                                                                         <td>
                                                                             <div class="d-flex align-center mx-40">
-                                                                                <div class="ratio-percentage me-15">{{ $goals_control->assistance_adv }}%
+                                                                                <div class="ratio-percentage me-15">{{ $goals_control->assistance_adv ?? 0 }}%
                                                                                 </div>
                                                                                 <div class="progress-wrap mb-0">
                                                                                     <div class="progress">
                                                                                         <div class="progress-bar bg-primary"
                                                                                             role="progressbar"
-                                                                                            style="width: {{ $goals_control->assistance_adv }}%;"
-                                                                                            aria-valuenow="{{ $goals_control->assistance_adv }}"
+                                                                                            style="width: {{ $goals_control->assistance_adv ?? 0 }}%;"
+                                                                                            aria-valuenow="{{ $goals_control->assistance_adv ?? 0 }}"
                                                                                             aria-valuemin="0"
                                                                                             aria-valuemax="100"></div>
 
@@ -264,14 +264,14 @@
                                                                         <td>-</td>
                                                                         <td>
                                                                             <div class="d-flex align-center mx-40">
-                                                                                <div class="ratio-percentage me-15">{{ $goals_control->conversions_adv }}%
+                                                                                <div class="ratio-percentage me-15">{{ $goals_control->conversions_adv ?? 0 }}%
                                                                                 </div>
                                                                                 <div class="progress-wrap mb-0">
                                                                                     <div class="progress">
                                                                                         <div class="progress-bar bg-primary"
                                                                                             role="progressbar"
-                                                                                            style="width: {{ $goals_control->conversions_adv }}%;"
-                                                                                            aria-valuenow="{{ $goals_control->conversions_adv }}"
+                                                                                            style="width: {{ $goals_control->conversions_adv ?? 0 }}%;"
+                                                                                            aria-valuenow="{{ $goals_control->conversions_adv ?? 0 }}"
                                                                                             aria-valuemin="0"
                                                                                             aria-valuemax="100"></div>
 
@@ -294,14 +294,14 @@
                                                                         <td>-</td>
                                                                         <td>
                                                                             <div class="d-flex align-center mx-40">
-                                                                                <div class="ratio-percentage me-15">{{ $goals_control->baptisms_adv }}%
+                                                                                <div class="ratio-percentage me-15">{{ $goals_control->baptisms_adv ?? 0 }}%
                                                                                 </div>
                                                                                 <div class="progress-wrap mb-0">
                                                                                     <div class="progress">
                                                                                         <div class="progress-bar bg-secondary"
                                                                                             role="progressbar"
-                                                                                            style="width: {{ $goals_control->baptisms_adv }}%;"
-                                                                                            aria-valuenow="{{ $goals_control->baptisms_adv }}"
+                                                                                            style="width: {{ $goals_control->baptisms_adv ?? 0 }}%;"
+                                                                                            aria-valuenow="{{ $goals_control->baptisms_adv ?? 0 }}"
                                                                                             aria-valuemin="0"
                                                                                             aria-valuemax="100"></div>
                                                                                     </div>
@@ -323,14 +323,14 @@
                                                                         <td>-</td>
                                                                         <td>
                                                                             <div class="d-flex align-center mx-40">
-                                                                                <div class="ratio-percentage me-15">{{ $goals_control->programmed_visits_adv }}%
+                                                                                <div class="ratio-percentage me-15">{{ $goals_control->programmed_visits_adv ?? 0 }}%
                                                                                 </div>
                                                                                 <div class="progress-wrap mb-0">
                                                                                     <div class="progress">
                                                                                         <div class="progress-bar bg-info"
                                                                                             role="progressbar"
-                                                                                            style="width: {{ $goals_control->programmed_visits_adv }}%;"
-                                                                                            aria-valuenow="{{ $goals_control->programmed_visits_adv }}"
+                                                                                            style="width: {{ $goals_control->programmed_visits_adv ?? 0 }}%;"
+                                                                                            aria-valuenow="{{ $goals_control->programmed_visits_adv ?? 0 }}"
                                                                                             aria-valuemin="0"
                                                                                             aria-valuemax="100"></div>
                                                                                     </div>

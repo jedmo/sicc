@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('day')->nullable();
             $table->time('hour', precision: 0)->nullable();
             $table->boolean('status');
+            $table->string('temp_leader')->nullable();
             $table->foreignId('user_leader_id')->nullable()->constrained('users');
             $table->foreignId('leader_id')->nullable()->constrained('cell_members');
             $table->foreignId('host_id')->nullable()->constrained('cell_members');

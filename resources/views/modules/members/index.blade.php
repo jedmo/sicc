@@ -156,6 +156,7 @@
                                                                     <i class="uil uil-edit"></i>
                                                                 </a>
                                                             </li>
+                                                            @unlessrole('Líder')
                                                             <li>
                                                                 <a
                                                                     href="#"
@@ -177,6 +178,7 @@
                                                                     @method('delete')
                                                                 </form>
                                                             </li>
+                                                            @endunlessrole
                                                         </ul>
                                                     </td>
                                                     {{-- @endhasanyrole --}}

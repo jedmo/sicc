@@ -11,6 +11,7 @@ use App\Models\CellMember;
 use App\Models\Goal;
 use App\Models\GoalControl;
 use App\Models\MunicipalDistrict;
+use App\Models\User;
 use App\Traits\DataFilterTrait;
 use Illuminate\Support\Carbon;
 
@@ -42,6 +43,7 @@ class CellController extends Controller
     {
         $show = 0;
         $cell = new Cell;
+        $initial = new CellInitialData();
         $members = $this->getMembers();
         $sectors = $this->getSector();
         $municipalities = MunicipalDistrict::all();
@@ -49,7 +51,7 @@ class CellController extends Controller
         $cell->address()->associate($address);
         $cell->sector()->associate($sectors);
 
-        return view('modules.cells.create', compact('members', 'cell', 'sectors', 'address', 'municipalities', 'show'));
+        return view('modules.cells.create', compact('members', 'cell', 'sectors', 'address', 'municipalities', 'show', 'initial'));
     }
 
     /**
@@ -89,7 +91,10 @@ class CellController extends Controller
      */
     public function show(Cell $cell)
     {
-        $members = CellMember::where('cell_id', $cell->id)->with('member')->get();
+        $members = CellMember::where('cell_id', $cell->id)->with('member')
+            ->join('members', 'cell_members.member_id', '=', 'members.id') // Join with the members table
+            ->select('cell_members.*')
+            ->orderBy('members.status', 'desc')->get();
         $municipalities = MunicipalDistrict::all();
         $show = 1;
         $goals = Goal::where('start_period', '<=', now())->where('end_period', '>=', now())->first();
@@ -101,10 +106,17 @@ class CellController extends Controller
         $goals['programmed_visits'] = ((int)$goals->programmed_visits / $years) * (int)$actual;
 
         $goals_control = GoalControl::where('cell_id', $cell->id)->first();
-        $goals_control['assistance_adv'] = ((int)$goals_control->assistance / (int)$goals['assistance']) * 100;
-        $goals_control['conversions_adv'] = ((int)$goals_control->conversions / (int)$goals['conversions']) * 100;
-        $goals_control['baptisms_adv'] = ((int)$goals_control->baptisms / (int)$goals['baptisms']) * 100;
-        $goals_control['programmed_visits_adv'] = ((int)$goals_control->programmed_visits / (int)$goals['programmed_visits']) * 100;
+        if ($goals_control) {
+            $goals_control['assistance_adv'] = ((int)$goals_control->assistance / (int)$goals['assistance']) * 100;
+            $goals_control['conversions_adv'] = ((int)$goals_control->conversions / (int)$goals['conversions']) * 100;
+            $goals_control['baptisms_adv'] = ((int)$goals_control->baptisms / (int)$goals['baptisms']) * 100;
+            $goals_control['programmed_visits_adv'] = ((int)$goals_control->programmed_visits / (int)$goals['programmed_visits']) * 100;
+        } else {
+            $goals_control['assistance_adv'] = 0;
+            $goals_control['conversions_adv'] = 0;
+            $goals_control['baptisms_adv'] = 0;
+            $goals_control['programmed_visits_adv'] = 0;
+        }
 
         $initial = CellInitialData::where('cell_id', $cell->id)->first();
 
@@ -119,7 +131,8 @@ class CellController extends Controller
      */
     public function edit(Cell $cell)
     {
-        $members = CellMember::where('cell_id', $cell->id)->with('member')->get();
+        // $members = CellMember::where('cell_id', $cell->id)->with('member')->get();
+        $members = $this->getMembers();
         $initial = CellInitialData::where('cell_id', $cell->id)->firstOrNew();
         $show = 0;
         $municipalities = MunicipalDistrict::all();

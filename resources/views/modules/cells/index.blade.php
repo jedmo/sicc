@@ -84,7 +84,7 @@
                                                     </td>
                                                     <td>
                                                         <div class="userDatatable-content d-inline-block">
-                                                            <span>{{ $cell->leader->full_name }}</span>
+                                                            <span>{{ $cell->leader->full_name ?? $cell->temp_leader }}</span>
                                                         </div>
                                                     </td>
                                                     <td>

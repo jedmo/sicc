@@ -9,8 +9,8 @@
     @endif
 </div>
 <div class="form-group mb-25">
-    <label for="leader_id" class="color-dark fs-14 fw-500 align-center">Líder<span class="text-danger">*</span></label>
-    <select class="form-control ih-medium ip-gray radius-xs b-light px-15" name="leader_id" id="leader_id" {{ $show ? 'disabled' : '' }} required>
+    <label for="leader_id" class="color-dark fs-14 fw-500 align-center">Líder</label>
+    <select class="form-control ih-medium ip-gray radius-xs b-light px-15" name="leader_id" id="leader_id" {{ $show ? 'disabled' : '' }}>
         <option value="">Seleccione</option>
         @foreach ( $members as $member )
         <option value="{{ $member['id'] }}" {{ $cell->leader_id == $member['id'] ? 'selected' : '' }}>
@@ -20,6 +20,14 @@
     </select>
     @if ($errors->has('leader_id'))
     <p class="text-danger">{{ $errors->first('leader_id') }}</p>
+    @endif
+</div>
+<div class="form-group mb-25">
+    <label for="temp_leader" class="color-dark fs-14 fw-500 align-center">Líder temporal</label>
+    <input type="text" class="form-control ih-medium ip-gray radius-xs b-light px-15" name="temp_leader"
+        value="{{ $cell->temp_leader }}" id="temp_leader" placeholder="Nombre del líder temporal" {{ $show ? 'disabled' : '' }}>
+    @if($errors->has('temp_leader'))
+    <p class="text-danger">{{ $errors->first('temp_leader') }}</p>
     @endif
 </div>
 <div class="form-group mb-25">

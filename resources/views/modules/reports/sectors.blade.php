@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 mb-30">
-                <div class="card">
+                <div class="card mt-4">
                     <div class="card-header color-dark fw-500">
                         Reportes de Sector
                         @hasrole('Supervisor')
@@ -13,9 +13,9 @@
                         @endhasrole
                         <div class="card-extra">
                             <div class="dropdown  dropdown-click ">
-                                <a class="btn btn-primary" href="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="btn btn-outline-primary" href="" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="las la-angle-down"></i>
                                     Exportar
-                                    <img src="{{ asset('assets/img/svg/chevron-down.svg') }}" alt="chevron-down" class="svg">
                                 </a>
                                 <div class="dropdown-default dropdown-menu">
                                     <a class="dropdown-item" href="#">Excel</a>
